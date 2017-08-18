@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Eurominder Explorer</title>
+
+    <meta charset="UTF-8">
+
+    <link rel="stylesheet" type="text/css"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css"
+          href="http://cdnjs.cloudflare.com/ajax/libs/dc/1.7.5/dc.css"/>
+
+    <style>
+
+        /* selected map element */
+        .dc-chart .selected path {
+            stroke-width: 1.5;
+            stroke: #f00;
+            fill-opacity: 1;
+        }
+
+        /* play/pause buttons */
+        .btn {
+            font-weight: bold;
+            padding-left: 8px;
+            padding-right: 8px;
+            margin-left: 4px;
+            margin-right: 0;
+            margin-top: 20px;
+        }
+
+        .x-axis-label, .y-axis-label {
+            font-size: 12px;
+        }
+
+    </style>
+
+</head>
+<body>
+
+<div class="container">
+
+    <h2>
+        <a href="../../examples/eurominder/eurominder.html">Eurominder</a> Explorer
+        - an <a href="../../index.html">Ozelot</a> Example
+    </h2>
+
+    <div class="row" style="margin-top: 15px">
+
+        <!-- selector for data item shown on map and on scatter plot y axis; NOT managed by crossfilter -->
+        <div class="col-md-5">
+            <div class="form-group">
+                <label for="y-selector">Map Color and Plot Y Axis:</label>
+                <select class="form-control" id="y-selector" onchange="updateSelection()">
+                    {{ y_field_selector_options }}
+                </select>
+            </div>
+        </div>
+
+        <!-- selector for data item shown on map and on scatter plot x axis; NOT managed by crossfilter -->
+        <div class="col-md-5">
+            <div class="form-group">
+                <label for="x-selector">Plot X Axis:</label>
+                <select class="form-control" id="x-selector" onchange="updateSelection()">
+                    {{ x_field_selector_options }}
+                </select>
+            </div>
+        </div>
+
+        <!-- selector for year; NOT managed by crossfilter -->
+        <div class="col-md-1">
+            <div class="form-group">
+                <label for="year-selector">Year:</label>
+                <select class="form-control" id="year-selector" onchange="updateSelection()">
+                    {{ year_selector_options }}
+                </select>
+            </div>
+        </div>
+
+        <!-- playback control buttons -->
+        <div class="col-md-1">
+            <button type="button" class="btn btn-primary"
+                    onclick="stopPlayback=false; currentPlaybackIndex=0; play();">&gt;</button>
+            <button type="button" class="btn btn-primary" onclick="pause();">||</button>
+        </div>
+
+    </div>
+
+    <div class="row" style="margin-top: 15px">
+
+        <!-- container for country selector -->
+        <div class="col-md-1">
+            <div id="country-selector">
+                <span class="text-muted">Select Country: </span>
+                <a class="reset" href="javascript:countrySelector.filterAll(); dc.renderAll();"
+                   style="display: none;"><strong>Reset</strong></a>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <!-- container for chloropleth map -->
+        <div class="col-md-6">
+            <div id="nuts2-chart">
+                <span class="text-muted">Click map to select regions.</span>
+                <a class="reset" href="javascript:nuts2Chart.filterAll(); dc.renderAll();"
+                   style="display: none;"><strong>Reset Filter</strong></a>
+                <span class="reset" style="display: none;"> | Current filter: <span class="filter"></span></span>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <!-- container for scatter chart -->
+        <div class="col-md-5">
+            <div id="scatter-chart">
+                <label class="checkbox-inline">
+                    <input type="checkbox" value="" id="scatter-brush-checkbox"
+                           onchange="scatterChart.filterAll(); scatterChart.brushOn(this.checked); dc.renderAll();">
+                    Enable click/drag selection (disables tooltips)
+                </label>
+                <a class="reset" href="javascript:scatterChart.filterAll(); dc.renderAll();"
+                   style="display: none;"><strong>Reset Filter</strong></a>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- four containers for climate charts -->
+    <div class="row" style="margin-top: 15px">
+
+        <div class="col-md-3">
+            <div id="climate-chart-0">
+                <span class="text-muted">Click/drag to filter</span>
+                <a class="reset" href="javascript:climateBarCharts[0].filterAll(); dc.renderAll();"
+                   style="display: none;"><strong> | Reset Filter</strong></a>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div id="climate-chart-1">
+                <span class="text-muted">Click/drag to filter</span>
+                <a class="reset" href="javascript:climateBarCharts[1].filterAll(); dc.renderAll();"
+                   style="display: none;"><strong> | Reset Filter</strong></a>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div id="climate-chart-2">
+                <span class="text-muted">Click/drag to filter</span>
+                <a class="reset" href="javascript:climateBarCharts[2].filterAll(); dc.renderAll();"
+                   style="display: none;"><strong> | Reset Filter</strong></a>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div id="climate-chart-3">
+                <span class="text-muted">Click/drag to filter</span>
+                <a class="reset" href="javascript:climateBarCharts[3].filterAll(); dc.renderAll();"
+                   style="display: none;"><strong> | Reset Filter</strong></a>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/d3-composite-projections/0.3.5/composite-projections.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.js"></script>
+<script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.js"></script>
+
+<!--suppress UnterminatedStatementJS -->
+<script type="text/javascript">
+
+    var nuts2Chart = dc.geoChoroplethChart("#nuts2-chart");
+    var scatterChart = dc.scatterPlot("#scatter-chart");
+    var countrySelector = dc.selectMenu("#country-selector")
+    var climateBarCharts = [];
+    var numberFormat = d3.format(".2f");
+    var stopPlayback = true;
+    var currentPlaybackIndex = 0;
+    var selectionHasData = true;
+
+    var data = {{ data }};
+
+    var cx = crossfilter(data.indicators);
+
+    // region dimension, used for map plot
+    var region = cx.dimension(function (d) {
+        return d.key;
+    });
+
+    // country dimension for selection menu
+    var country = cx.dimension(function (d) {
+        return d.key.substr(0, 2);
+    });
+
+    // dimension for scatter plot, generated below
+    var scatterDimension;
+
+    // the indicator to show on the map and on the plot y axis
+    var mapIndicator;
+
+    var mapSize = 500;
+
+    // map color scale (from ColorBrewer, plus darkening with d3)
+    var colorScale = ["#ffffd9", "#edf8b1", "#c7e9b4", "#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84"];
+    var mapColors = d3.scale.quantize().range(colorScale.map(function(c) {
+        return d3.hsl(c).darker(0.5);
+    }));
+
+    // initialize country selector
+    countrySelector
+        .dimension(country)
+        .group(country.group())
+        .multiple(true)
+        .numberVisible(8);
+
+    var climateColors = ["#b2df8a","#33a02c","#fb9a99","#e31a1c"];
+
+    // build climate bar charts
+    for (var i=0; i<4; i++) {
+        // do everything in an IEFE to avoid problems with changing variables and closures
+        (function(){
+
+            var binwidth = 1.0;
+            var description = data['climateDescriptions'][i];
+
+            // dimensions and groups for histogram
+            var dim = cx.dimension(function(d) {
+                return d[description];
+            });
+            // group by binned value for that description
+            var group = dim.group(function(v) {
+                return binwidth * Math.floor(v / binwidth);
+            });
+
+            var barChart = dc.barChart('#climate-chart-' + i)
+                .width(270)
+                .height(180)
+                .transitionDuration(0)
+                .margins({top: 10, right: 0, bottom: 40, left: 35})
+                .dimension(dim)
+                .group(group)
+                .elasticY(true)
+                .centerBar(false)
+                .gap(1)
+                .colors(climateColors[i])
+                .brushOn(true)
+                .x(d3.scale.linear().domain([data.ranges[description][0] - binwidth,
+                                             data.ranges[description][1] + binwidth]))
+                .renderHorizontalGridLines(true)
+                .xAxisLabel(description)
+                .yAxisLabel("Region count")
+                // rounding and units for binned data
+                .xUnits(dc.units.fp.precision(binwidth))
+                .round(Math.floor)
+                .alwaysUseRounding(true);
+
+            climateBarCharts.push(barChart);
+
+        })();
+    }
+
+    // update data after selecting indicator or year
+    function updateSelection() {
+
+        // get selected indicators and year
+        var yIndicatorKey = document.getElementById('y-selector').value
+            + ' ' + document.getElementById('year-selector').value;
+        var xIndicatorKey = document.getElementById('x-selector').value
+            + ' ' + document.getElementById('year-selector').value;
+
+        // indicator descriptions
+        var xIndicatorNumber = xIndicatorKey.split(" ")[0];
+        var xDescription = data.indicatorDescriptions[xIndicatorNumber];
+        var yIndicatorNumber = yIndicatorKey.split(" ")[0];
+        var yDescription = data.indicatorDescriptions[yIndicatorKey.split(" ")[0]];
+
+        // update crossfilter group for map plot and y axis
+        mapIndicator = region.group().reduceSum(function (d) {
+            return d[yIndicatorKey];
+        });
+        nuts2Chart.group(mapIndicator);
+
+        // update crossfilter group for plot x axis
+        mapIndicator = region.group().reduceSum(function (d) {
+            return d[yIndicatorKey];
+        });
+
+        // indicator ranges
+        var xRange = data.ranges[xIndicatorNumber];
+        var yRange = data.ranges[yIndicatorNumber];
+
+        // update color range on map chart
+        mapColors.domain(yRange);
+
+        // format map chart
+        nuts2Chart
+            .width(mapSize)
+            .height(mapSize)
+            .group(mapIndicator)
+            // dc transitions colors through white, that's not nice for seeing changes; turn off transitions
+            .transitionDuration(0)
+            .dimension(region)
+            .projection(d3.geo.conicConformalEurope())
+            .colors(function (v) {
+                return v ? mapColors(v) : "#ccc"
+            })
+            .overlayGeoJson(data["nuts2Features"], "NUTS2", function (d) {
+                return d.properties["NUTS_ID"];
+            })
+            .title(function (d) {
+                return "NUTS2 Region: " + d.key + " (" + data.regionNames[d.key]
+                    + ")\nValue: " + (d.value ? numberFormat(d.value) : "(none)");
+            });
+
+        // clear filter on scatter chart when new indicators are selected
+        scatterChart.filterAll();
+
+        // dimension for scatter chart
+        if (scatterDimension !== undefined) { scatterDimension.dispose(); }
+        scatterDimension = cx.dimension(function (d) {
+            return [d[xIndicatorKey], d[yIndicatorKey], d.key];
+        });
+
+        // format scatter chart
+        scatterChart
+            .width(480)
+            .height(480)
+            .transitionDuration(0)
+            .margins({top: 10, right: 10, bottom: 50, left: 70})
+            .dimension(scatterDimension)
+            .group(scatterDimension.group())
+            // hide any points with undefined x or y
+            // see: https://stackoverflow.com/questions/31699747/how-to-deal-with-missing-data-with-crossfilter-and-dc-js?rq=1
+            .data(function (group) {
+                return group.all().filter(function (d) {
+                    return d.key[0] && d.key[1];
+                })
+            })
+            .x(d3.scale.linear().domain(xRange))
+            .y(d3.scale.linear().domain(yRange))
+            .symbolSize(6)
+            .nonemptyOpacity(0.5)
+            .elasticY(false)
+            .elasticX(false)
+            .brushOn(document.getElementById('scatter-brush-checkbox').checked)
+            .renderHorizontalGridLines(true)
+            .renderVerticalGridLines(true)
+            .xAxisLabel(xDescription)
+            .yAxisLabel(yDescription)
+            .clipPadding(10)
+            .renderLabel(false)
+            .renderTitle(true)
+            .title(function (d) {
+                return "NUTS2 Region: " + d.key[2] + " (" + data.regionNames[d.key[2]] + ")\n" +
+                    xDescription + ": " + (d.key[0] ? numberFormat(d.key[0]) : "(none)") + "\n" +
+                    yDescription + ": " + (d.key[1] ? numberFormat(d.key[1]) : "(none)") + "\n";
+            });
+
+        // update flag telling us whether any plot had data for the selected indicator/year;
+        // this is the case if the second value (shown on the map) is present
+        selectionHasData = scatterDimension.group().all().filter(function (d) {
+            return d.key[1];
+        }).length > 0;
+
+        dc.renderAll();
+    }
+
+    // playback across years
+    function play() {
+        if (!stopPlayback) {
+            // select year according to current index, render
+            document.getElementById('year-selector').value = data.years[currentPlaybackIndex];
+            updateSelection();
+
+            // update current year index for next time step
+            currentPlaybackIndex = (currentPlaybackIndex + 1) % data.years.length;
+
+            // set timeout to call play function in a loop: if chart had no data, don't wait
+            setTimeout(play, selectionHasData ? 1000 : 0);
+        }
+    }
+
+    function pause() {
+        // set stop flag for playback
+        stopPlayback = true;
+    }
+
+    // initial data setting
+    updateSelection();
+
+</script>
+
+</body>
+</html>

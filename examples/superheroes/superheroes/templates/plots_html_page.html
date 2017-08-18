@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+    <!--Based on basic bootstrap template from http://getbootstrap.com/getting-started/-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>Superheroes - Statistics</title>
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <style>
+            svg {
+                margin-bottom: 20px;
+            }
+        </style>
+
+    </head>
+    <body>
+        <div class="container">
+
+        <h1>Superheroes - Statistics</h1>
+
+        <p>
+            This page shows general statitics about the
+            <a href="../../examples/superheroes/superheroes.html">ozelot example project 'superheroes'</a>.
+        </p>
+
+        <p>
+            The characters analyzed here are limited to the following <b>universes</b> (see also
+            <a href="../../examples/superheroes/pipeline.html">the example's documentation</a>):
+            {{ universes_list }}.
+        </p>
+
+        <p class="small">
+            The analyses shown here are not performed with rigorous statistical methods and ignore, for example,
+            issues in analyzing small numbers of samples.
+            This page serves only to demonstrate data visualization and output generation.
+        </p>
+
+        <h3>Number of characters and movies</h3>
+
+        <p>
+            The following two plots show the number of first character appearances per year and the number
+            of published movies per year.
+        </p>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                {{ first_appearances_per_year_svg }}
+            </div>
+
+            <div class="col-md-6">
+                    {{ movies_per_year_svg }}
+            </div>
+
+        </div>
+
+        <p>
+            Both counts grow strongly over the years,
+            with the number of first appearances growing faster than the number of movies.
+            Note that a 'first appearance' doesn't have to be a movie appearance but may also be in some
+            other form of media.
+        </p>
+
+        <p>
+            Let's look at the average number of character appearances in a movie
+            (all, not only first appearances) per year.
+        </p>
+
+        <div class="row">
+
+            <div class="col-md-3">
+            </div>
+
+            <div class="col-md-6">
+                    {{ average_appearances_per_movie_svg }}
+            </div>
+
+        </div>
+
+        <p>
+            While the number of first appearances of characters grows substantially over the years,
+            the total number of characters per movie stays relatively constant between 1995 and 2016.
+        </p>
+
+        <h3>Budget</h3>
+
+        <p>
+            Let's analyze at the development of movie budgets over the years, with and without inflation adjustment.
+        </p>
+
+        <div class="row">
+
+            <div class="col-md-6">
+                {{ budget_per_year_svg }}
+            </div>
+
+            <div class="col-md-6">
+                    {{ budget_adjusted_per_year_svg }}
+            </div>
+
+        </div>
+
+        <p>
+            Movie budgets generally increase over the years. However, after adjusting for inflation,
+            this increase is far less remarkable.
+        </p>
+
+        </div>
+
+        <div style="height: 20px"></div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    </body>
+</html>
