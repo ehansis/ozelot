@@ -28,7 +28,7 @@ generates an overview table for all Characters,
 including their Universe, place of birth and number of movie appearances:
 
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/analysis.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/analysis.py
     :pyobject: character_summary_table
 
 The code is pretty straightforward, with two notable details: (1) the ``outerjoin`` on

@@ -207,7 +207,7 @@ Loading Universes
 The first and simplest task in the pipeline, :class:`LoadUniverses`, loads data about all
 'Universes'. This is done by querying the API of the wiki.
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: LoadUniverses
 
 .. _ht-ormobjectcreator:
@@ -248,7 +248,7 @@ We want the loading of Universes to be completed before loading Characters, in o
 set relationships between them (see below). Therefore, :class:`LoadCharacters` lists
 :class:`LoadUniverses` as a requirement:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: LoadCharacters.requires
     :dedent: 4
 
@@ -260,7 +260,7 @@ set relationships between them (see below). Therefore, :class:`LoadCharacters` l
 
 For character data we need two queries. The first one retrieves a list of all character pages:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :start-after: -- start documentation include: character-list-query
     :end-before: -- end documentation include: character-list-query
     :dedent: 8
@@ -270,7 +270,7 @@ For character data we need two queries. The first one retrieves a list of all ch
 When iterating over this list, we retrieve the details about each character from
 its wiki page (i.e. not via the wiki API):
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
         :start-after: -- start documentation include: character-page-query
         :end-before: -- end documentation include: character-page-query
         :dedent: 12
@@ -302,7 +302,7 @@ has relationships to two other ORM object classes, namely :class:`Universe` and
 :class:`Place`. When creating characters, we have to define which universe to
 reference:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
             :start-after: -- start documentation include: universe-object-relation
             :end-before: -- end documentation include: universe-object-relation
             :dedent: 16
@@ -318,7 +318,7 @@ For the place of birth want to reference a :class:`Place` object. However, in co
 to the Universes, we have not ingested the places beforehand. Instead, we create
 new place objects as we go:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
                 :start-after: -- start documentation include: place-object-relation
                 :end-before: -- end documentation include: place-object-relation
                 :dedent: 16
@@ -334,7 +334,7 @@ Next, we want to load data about movies in :class:`LoadMovies`. This task
 requires Characters to have been loaded and additionally needs an input file
 containing movie ratings:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: LoadMovies.requires
     :dedent: 4
 
@@ -346,7 +346,7 @@ A static input file
 The input file containing the movie ratings is represented by the task
 :class:`IMDBMovieRatings`:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: IMDBMovieRatings
 
 This is a static input file, the pipeline never changes it. We can represent it by a task
@@ -405,7 +405,7 @@ and we don't need the auto-flushing anyway.
 
 Secondly, here is how we generate the association objects for the many-to-many relationship:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
                 :start-after: -- start documentation include: many-to-many-generation
                 :end-before: -- end documentation include: many-to-many-generation
                 :dedent: 36
@@ -431,7 +431,7 @@ This means that we have to write our own :func:`clear` method:
 
 .. _ht-custom-clear:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: InflationAdjustMovieBudgets.clear
     :dedent: 4
 
@@ -461,7 +461,7 @@ with a wrapper task :class:`Tests`.
 
 As an example, :class:`LoadUniverses` is tested by :class:`TestUniverses`:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: TestUniverses
 
 This task does no actual data ingestion. It queries various subsets of data and
@@ -488,7 +488,7 @@ We don't need to list every single task of the pipeline, because the requirement
 listed tasks will be built, too. (Which tasks to include is a matter of taste, just make
 sure everything you want built is included as a requirement somewhere.)
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/pipeline.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/pipeline.py
     :pyobject: LoadEverything
 
 

@@ -42,7 +42,7 @@ The simplest object class is the :class:`superheroes.models.Universe`. It descri
 'universe' or 'continuity' within the
 `Marvel multiverse <https://en.wikipedia.org/wiki/Multiverse_(Marvel_Comics)>`_.
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/models.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/models.py
     :pyobject: Universe
 
 The class defines to fields, a :attr:`name` and an :attr:`url`.
@@ -80,7 +80,7 @@ The next object class, :class:`superheroes.models.Place`, describes a place or l
 It is used to represent the place of birth of a superhero.
 The class is very similar to the Universe, with one exception:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/models.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/models.py
     :pyobject: Place
 
 The exception is the method :meth:`superheroes.models.Place.truncate`, decorated with
@@ -102,7 +102,7 @@ More details and exapmles on validators can be found in the
 The class :class:`superheroes.models.Character` holds most data about a superhero.
 It introduces the important concept of object relationships:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/models.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/models.py
     :pyobject: Character
 
 You will recognize the definition of string columns and the string length validation from previous models.
@@ -145,7 +145,7 @@ foreign key field :attr:`place_of_birth_id`.
 The :class:`superheroes.models.Movie` class does not introduce any new data modeling features,
 so relax and recap what you already know.
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/models.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/models.py
     :pyobject: Movie
 
 
@@ -157,7 +157,7 @@ so relax and recap what you already know.
 The final class, :class:`superheroes.models.MovieAppearance`, demonstrates how to define many-to-many
 relationship patterns.
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/models.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/models.py
     :pyobject: MovieAppearance
 
 The relationship pattern demonstrated in :class:`superheroes.models.Character` allows defining one-to-many,
@@ -191,7 +191,7 @@ The table structure of a class is given by the class attributes.
 Therefore, :mod:`sqlalchemy` can automatically build the table structure for you.
 In :class:`superheroes.models` you find a handy utility function to do this:
 
-.. literalinclude:: ../ozelot-examples/superheroes/superheroes/models.py
+.. literalinclude:: ../../../examples/superheroes/superheroes/models.py
     :pyobject: reinitialize
 
 This function drops all tables associated with ORM objects and then re-creates them.

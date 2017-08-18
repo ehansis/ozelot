@@ -31,7 +31,7 @@ Indicator values (time series and cascading)
 The class :class:`EuroStatValue` represents one value of a socioeconomic indicator, for one
 NUTS2 region and one year:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/models.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/models.py
     :pyobject: EuroStatValue
 
 .. _ht-timeseries-model:

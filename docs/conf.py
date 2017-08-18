@@ -23,11 +23,11 @@ import sphinx_rtd_theme
 
 
 # add directory containing ozelot module to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'ozelot-src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # add directories containing examples to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'examples', 'ozelot-examples', 'eurominder'))
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'examples', 'ozelot-examples', 'superheroes'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'examples', 'eurominder'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'examples', 'superheroes'))
 
 
 # -- General configuration ------------------------------------------------

@@ -57,7 +57,7 @@ Below you see a screenshot of the interface:
     .. image:: ../../_static/eurominder/explorer_screenshot.png
 
 The HTML and JavaScript is contained in the template file
-:download:`eurominder_explorer.html <../ozelot-examples/eurominder/eurominder/templates/eurominder_explorer.html>`
+:download:`eurominder_explorer.html <../../../examples/eurominder/eurominder/templates/eurominder_explorer.html>`
 in the example's ``templates`` folder. (Opening this template will **not** show the dashboard, it misses the data!)
 This is a `jinja2 <http://jinja.pocoo.org/docs/2.9/>`_ template, into which the function
 :func:`eurominder.analysis.eurominder_explorer` injects data in JSON format.

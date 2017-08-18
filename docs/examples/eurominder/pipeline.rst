@@ -81,7 +81,7 @@ on the import.
 
 So far this is nothing new, but let's recap how objects are created and added to the database:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
             :start-after: -- start documentation include: standard-object-add
             :end-before: -- end documentation include: standard-object-add
             :dedent: 8
@@ -171,7 +171,7 @@ and explained in the following.
 Before we load any indicator values, we first create a new metadata instance for this indicator.
 This is done the 'old fashioned' way:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :start-after: -- start documentation include: eurostats-run-1
     :end-before: -- end documentation include: eurostats-run-1
     :dedent: 8
@@ -181,7 +181,7 @@ with columns ``value``, ``year``, ``region_id``, ``indicator_id`` and ``id``, to
 of the :class:`eurominder.models.EuroStatValue` class. After the following operations, we have
 ``value`` and ``year`` columns, and a colum ``key`` containing the NUTS2 region keys.
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :start-after: -- start documentation include: eurostats-run-2
     :end-before: -- end documentation include: eurostats-run-2
     :dedent: 8
@@ -189,7 +189,7 @@ of the :class:`eurominder.models.EuroStatValue` class. After the following opera
 As mentioned above, we need to generate the primaray keys 'manually'. To this end, we
 add an ``id`` column:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :start-after: -- start documentation include: eurostats-run-3
     :end-before: -- end documentation include: eurostats-run-3
     :dedent: 8
@@ -199,7 +199,7 @@ linking the values to NUTS2 regions. For the latter, we retrieve the mapping fro
 region object IDs from the database. The final step to get our table in the right format is to drop the
 column ``key``, which is not part of the object attributes:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :start-after: -- start documentation include: eurostats-run-4
     :end-before: -- end documentation include: eurostats-run-4
     :dedent: 8
@@ -210,7 +210,7 @@ instead of replacing it: this way, we would get an error message if our table st
 that of the ORM-generated table. Finally, we call :func:`done` to close the database session and mark the task
 as complete.
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :start-after: -- start documentation include: eurostats-run-5
     :end-before: -- end documentation include: eurostats-run-5
     :dedent: 8
@@ -226,7 +226,7 @@ we defined a `backref with cascading <ht-cascading>`_. This comes in handy for c
 indicator metadata and values for one input table: Deleting the indicator deletes all associated
 values, because of the defined cascading behaviour.
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :pyobject: LoadEuroStatsTableBase.clear
     :dedent: 4
 
@@ -237,7 +237,7 @@ Consistency checks and wrapper tasks
 
 All table loader tasks are wrapped in the task :class:`LoadAllEuroStatsTables`:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :pyobject: LoadAllEuroStatsTables
 
 For each loader task, there is a task checking data consistency. All test tasks
@@ -247,7 +247,7 @@ the derived test tasks define class attributes like the expected min/max range o
 and the allowed number of missing values, for example :class:`TestEuroStatsGDP`.
 All test tasks are wrapped in :class:`TestAllEuroStatsTables`:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :pyobject: TestAllEuroStatsTables
 
 
@@ -289,7 +289,7 @@ We load two different sets of climate data: surface air temperature and precipit
 The input files are represented by the same task :class:`ClimateDataInputFile`, using :mod:`luigi` parameters to define
 the climate variable name and the input file name:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :start-after: -- start documentation include: climate-input-params
     :end-before: -- end documentation include: climate-input-params
     :dedent: 4
@@ -297,7 +297,7 @@ the climate variable name and the input file name:
 Data is loaded by :class:`LoadClimateData`, which similarly takes parametes for the climate variable name
 and input file, and additionally for a description of the climate variable:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
         :start-after: -- start documentation include: climate-load-params
         :end-before: -- end documentation include: climate-load-params
         :dedent: 4
@@ -307,7 +307,7 @@ and how to instantiate tasks with parameters (simply pass the values into the co
 Here, an input file task with the same variable name and input file name as the loader task is
 set as requirement:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
     :pyobject: LoadClimateData.requires
 
 
@@ -336,7 +336,7 @@ Later, we need to draw polygons in the same coordinate system as the map. The po
 as lat/lon coordinates. To draw them, we need to translate these coordinates to indices in the map array.
 To this end, we build two interpolation functions that take lat (or lon) values and convert them to indices
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
         :start-after: -- start documentation include: climate-input-interp
         :end-before: -- end documentation include: climate-input-interp
         :dedent: 8
@@ -352,14 +352,14 @@ This is done in :func:`geojson_polygon_to_mask` (make sure to check out the full
 Setting up :mod:`matplotlib` for this task means defining a plot without any border or margin
 and with the right aspect ratio:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
         :start-after: -- start documentation include: poly-setup
         :end-before: -- end documentation include: poly-setup
         :dedent: 4
 
 After we have drawn the polygon, we can extract the image contents as a :mod:`numpy` array:
 
-.. literalinclude:: ../ozelot-examples/eurominder/eurominder/pipeline.py
+.. literalinclude:: ../../../examples/eurominder/eurominder/pipeline.py
             :start-after: -- start documentation include: poly-extract
             :end-before: -- end documentation include: poly-extract
             :dedent: 4

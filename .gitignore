@@ -99,6 +99,8 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# example data
 examples/eurominder/eurominder/data/air.mon.1981-2010.ltm.v301.nc
 examples/eurominder/eurominder/data/data.zip
 examples/eurominder/eurominder/data/NUTS_2013.csv
@@ -116,3 +118,6 @@ examples/superheroes/superheroes.db
 examples/superheroes/superheroes.db.zip
 examples/superheroes/superheroes_web_cache.db
 examples/superheroes/superheroes_web_cache.db.zip
+
+# PyCharm project conf
+.idea

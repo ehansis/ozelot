@@ -135,12 +135,11 @@ The complete API is documented in the `ozelot package <api/ozelot.html>`_ chapte
 Where to find what (repositories)
 *********************************
 
-The :mod:`ozelot` library code resides in the repository
-`ozelot-src <https://github.com/ehansis/ozelot-src>`_.
-Documentation sources can be found in the repository
-`ozelot-doc <https://github.com/ehansis/ozelot-doc>`_.
-Code and data for examples are in the repository
-`ozelot-examples <https://github.com/ehansis/ozelot-examples>`_.
+The :mod:`ozelot` library code, documentation sources and example sources reside in the repository
+`ozelot <https://github.com/trycs/ozelot>`_.
+
+Data for the examples are in the repository
+`ozelot-example-data <https://github.com/trycs/ozelot-example-data>`_.
 
 The compiled documentation (which you are currently viewing) is hosted
 on `readthedocs.org <https://readthedocs.org/>`_.

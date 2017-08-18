@@ -69,22 +69,6 @@ You can install these packages by using the ``requirements.txt`` file in the doc
     pip install -r requirements.txt
 
 
-Source code links
------------------
-
-The documentation includes code snippets from :mod:`ozelot` and the examples, as well as a full API documentation.
-To this end, the code must be available when building the documentation.
-The contents of the `ozelot-src repository <https://github.com/ehansis/ozelot-src>`_ are
-expected to be available in a directory ``ozelot-src`` in the documentation root (i.e. next to ``conf.py``).
-The contents of the `ozelot-examples repository <https://github.com/ehansis/ozelot-examples>`_ are
-expected a directory ``ozelot-examples`` in the ``examples`` directory of the documentation
-(i.e. next to the directory ``superheroes``).
-
-You can either clone these repositories into the expected locations, or you can symlink them
-if you already have them cloned somewhere else.
-
-
-
 Building the documentation
 --------------------------
 
@@ -92,6 +76,7 @@ To generate the documentation, run
 
 .. code-block:: none
 
+    cd docs
     make html
 
 The generated html will be placed in a sub-directory ``build`` of the documentation directory.
@@ -108,7 +93,8 @@ The :mod:`ozelot` API documentation is generated with Sphinx ``autodoc`` and ``s
 
 .. code-block:: none
 
-    sphinx-apidoc -f -o api ozelot-src/ozelot
+    cd docs
+    sphinx-apidoc -f -o api ../ozelot
 
 The file ``modules.rst`` that is part of the output is not needed and can be deleted.
 
@@ -117,12 +103,12 @@ the example documentation:
 
 .. code-block:: none
 
-    cd examples/superheroes
-    sphinx-apidoc -f -o api ../ozelot-examples/superheroes/superheroes
+    cd docs/examples/superheroes
+    sphinx-apidoc -f -o api ../../../examples/superheroes/superheroes
 
 
 .. code-block:: none
 
-    cd examples/eurominder
-    sphinx-apidoc -f -o api ../ozelot-examples/eurominder/eurominder
+    cd docs/examples/eurominder
+    sphinx-apidoc -f -o api ../../../examples/eurominder/eurominder
 

@@ -35,7 +35,7 @@ Once you have Python up and running (and have your virtual environment activated
 
 .. code-block:: none
 
-    pip install git+https://github.com/ehansis/ozelot-src.git
+    pip install git+https://github.com/trycs/ozelot.git
 
 If you are using anaconda, it is a good idea to install :mod:`numpy`, :mod:`scipy`, :mod:`pandas`,
 :mod:`matplotlib` and :mod:`lxml` via the conda package manager **before** installing :mod:`ozelot`
@@ -55,7 +55,7 @@ Ready-made conda environments
 
 If you want to set up a fresh conda environment for trying out :mod:`ozelot`, there is a handy environment
 file included in the repository. To set up a Python 2.7 environment, use the file ``environment-2.7.yml``
-`located in the repository root <https://raw.githubusercontent.com/ehansis/ozelot-src/master/environment-2.7.yml>`_
+`located in the repository root <https://raw.githubusercontent.com/trycs/ozelot/master/environment-2.7.yml>`_
 and run
 
 .. code-block:: none
@@ -65,5 +65,5 @@ and run
 
 This will set up a new conda environment called ``ozelot-2.7`` including all required packages.
 For a Python 3.5 environment, use the file ``environment-3.5.yml``
-`from the repository root <https://raw.githubusercontent.com/ehansis/ozelot-src/master/environment-3.5.yml>`_.
+`from the repository root <https://raw.githubusercontent.com/trycs/ozelot/master/environment-3.5.yml>`_.
 
