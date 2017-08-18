@@ -1,0 +1,215 @@
+digraph G {
+rankdir=LR;
+LoadEverything_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">LoadEverything</FONT></TD></TR></TABLE> >, shape="rect", style="dotted"];
+
+LoadAllEuroStatsTables_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">LoadAllEuroStatsTables</FONT></TD></TR></TABLE> >, shape="rect", style="dotted"];
+
+EuroStatsGDP_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsGDP</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00005 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00005</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00005 -> EuroStatsGDP_;
+
+NUTS2Regions_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">NUTS2Regions</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+NUTS2InputFile_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">NUTS2InputFile</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+NUTS2InputFile_ -> NUTS2Regions_;
+
+NUTS2Regions_ -> EuroStatsGDP_;
+
+EuroStatsGDP_ -> LoadAllEuroStatsTables_;
+
+EuroStatsUnemployment_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsUnemployment</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00010 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00010</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00010 -> EuroStatsUnemployment_;
+
+NUTS2Regions_ -> EuroStatsUnemployment_;
+
+EuroStatsUnemployment_ -> LoadAllEuroStatsTables_;
+
+EuroStatsPopDensity_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsPopDensity</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00024 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00024</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00024 -> EuroStatsPopDensity_;
+
+NUTS2Regions_ -> EuroStatsPopDensity_;
+
+EuroStatsPopDensity_ -> LoadAllEuroStatsTables_;
+
+EuroStatsHRSciTech_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsHRSciTech</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00038 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00038</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00038 -> EuroStatsHRSciTech_;
+
+NUTS2Regions_ -> EuroStatsHRSciTech_;
+
+EuroStatsHRSciTech_ -> LoadAllEuroStatsTables_;
+
+EuroStatsCancerDeaths_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsCancerDeaths</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00058 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00058</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00058 -> EuroStatsCancerDeaths_;
+
+NUTS2Regions_ -> EuroStatsCancerDeaths_;
+
+EuroStatsCancerDeaths_ -> LoadAllEuroStatsTables_;
+
+EuroStatsHeartDiseaseDeaths_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsHeartDiseaseDeaths</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00059 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00059</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00059 -> EuroStatsHeartDiseaseDeaths_;
+
+NUTS2Regions_ -> EuroStatsHeartDiseaseDeaths_;
+
+EuroStatsHeartDiseaseDeaths_ -> LoadAllEuroStatsTables_;
+
+EuroStatsFertilityRate_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsFertilityRate</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00100 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00100</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00100 -> EuroStatsFertilityRate_;
+
+NUTS2Regions_ -> EuroStatsFertilityRate_;
+
+EuroStatsFertilityRate_ -> LoadAllEuroStatsTables_;
+
+EuroStatsLifeExpectancy_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsLifeExpectancy</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+EuroStatsInputFile_number_00101 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">EuroStatsInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">number</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">00101</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+EuroStatsInputFile_number_00101 -> EuroStatsLifeExpectancy_;
+
+NUTS2Regions_ -> EuroStatsLifeExpectancy_;
+
+EuroStatsLifeExpectancy_ -> LoadAllEuroStatsTables_;
+
+LoadAllEuroStatsTables_ -> LoadEverything_;
+
+LoadAllClimateData_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">LoadAllClimateData</FONT></TD></TR></TABLE> >, shape="rect", style="dotted"];
+
+LoadClimateData_description_Mean_precipitation_mm_input_file_precipmonltmv301nc_variable_name_precip [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">LoadClimateData</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">variable_name</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">precip</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">description</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">Mean precipitation (...</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">input_file</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">precip.mon.ltm.v301....</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+ClimateDataInputFile_file_name_precipmonltmv301nc_variable_name_precip [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">ClimateDataInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">file_name</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">precip.mon.ltm.v301....</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">variable_name</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">precip</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+ClimateDataInputFile_file_name_precipmonltmv301nc_variable_name_precip -> LoadClimateData_description_Mean_precipitation_mm_input_file_precipmonltmv301nc_variable_name_precip;
+
+NUTS2GeoJSONInputFile_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">NUTS2GeoJSONInputFile</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+NUTS2GeoJSONInputFile_ -> LoadClimateData_description_Mean_precipitation_mm_input_file_precipmonltmv301nc_variable_name_precip;
+
+NUTS2Regions_ -> LoadClimateData_description_Mean_precipitation_mm_input_file_precipmonltmv301nc_variable_name_precip;
+
+LoadClimateData_description_Mean_precipitation_mm_input_file_precipmonltmv301nc_variable_name_precip -> LoadAllClimateData_;
+
+LoadClimateData_description_Mean_temperature_C_input_file_airmon19812010ltmv301nc_variable_name_air [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">LoadClimateData</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">variable_name</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">air</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">description</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">Mean temperature (C)</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">input_file</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">air.mon.1981-2010.lt...</FONT></TD></TR></TABLE> >, shape="rect", style="bold"];
+
+ClimateDataInputFile_file_name_airmon19812010ltmv301nc_variable_name_air [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">ClimateDataInputFile</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">file_name</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">air.mon.1981-2010.lt...</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">variable_name</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">air</FONT></TD></TR></TABLE> >, shape="rect", style="rounded"];
+
+ClimateDataInputFile_file_name_airmon19812010ltmv301nc_variable_name_air -> LoadClimateData_description_Mean_temperature_C_input_file_airmon19812010ltmv301nc_variable_name_air;
+
+NUTS2GeoJSONInputFile_ -> LoadClimateData_description_Mean_temperature_C_input_file_airmon19812010ltmv301nc_variable_name_air;
+
+NUTS2Regions_ -> LoadClimateData_description_Mean_temperature_C_input_file_airmon19812010ltmv301nc_variable_name_air;
+
+LoadClimateData_description_Mean_temperature_C_input_file_airmon19812010ltmv301nc_variable_name_air -> LoadAllClimateData_;
+
+LoadAllClimateData_ -> LoadEverything_;
+
+Tests_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">Tests</FONT></TD></TR></TABLE> >, shape="rect", style="dotted"];
+
+TestNUTS2Regions_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestNUTS2Regions</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+NUTS2Regions_ -> TestNUTS2Regions_;
+
+TestNUTS2Regions_ -> Tests_;
+
+TestAllEuroStatsTables_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestAllEuroStatsTables</FONT></TD></TR></TABLE> >, shape="rect", style="dotted"];
+
+TestEuroStatsGDP_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsGDP</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsGDP_ -> TestEuroStatsGDP_;
+
+TestEuroStatsGDP_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsUnemployment_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsUnemployment</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsUnemployment_ -> TestEuroStatsUnemployment_;
+
+TestEuroStatsUnemployment_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsPopDensity_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsPopDensity</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsPopDensity_ -> TestEuroStatsPopDensity_;
+
+TestEuroStatsPopDensity_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsHRSciTech_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsHRSciTech</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsHRSciTech_ -> TestEuroStatsHRSciTech_;
+
+TestEuroStatsHRSciTech_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsCancerDeaths_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsCancerDeaths</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsCancerDeaths_ -> TestEuroStatsCancerDeaths_;
+
+TestEuroStatsCancerDeaths_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsHeartDiseaseDeaths_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsHeartDiseaseDeaths</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsHeartDiseaseDeaths_ -> TestEuroStatsHeartDiseaseDeaths_;
+
+TestEuroStatsHeartDiseaseDeaths_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsFertilityRate_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsFertilityRate</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsFertilityRate_ -> TestEuroStatsFertilityRate_;
+
+TestEuroStatsFertilityRate_ -> TestAllEuroStatsTables_;
+
+TestEuroStatsLifeExpectancy_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestEuroStatsLifeExpectancy</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+EuroStatsLifeExpectancy_ -> TestEuroStatsLifeExpectancy_;
+
+TestEuroStatsLifeExpectancy_ -> TestAllEuroStatsTables_;
+
+TestAllEuroStatsTables_ -> Tests_;
+
+TestAllClimateData_ [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestAllClimateData</FONT></TD></TR></TABLE> >, shape="rect", style="dotted"];
+
+TestClimateData_description_Mean_temperature_C_OctMar_max_missing_10_max_val_30_min_val_10 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestClimateData</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_missing</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">10</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">30</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">description</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">Mean temperature (C)...</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">min_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">-10</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+LoadAllClimateData_ -> TestClimateData_description_Mean_temperature_C_OctMar_max_missing_10_max_val_30_min_val_10;
+
+TestClimateData_description_Mean_temperature_C_OctMar_max_missing_10_max_val_30_min_val_10 -> TestAllClimateData_;
+
+TestClimateData_description_Mean_temperature_C_AprSep_max_missing_10_max_val_35_min_val_5 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestClimateData</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_missing</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">10</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">35</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">description</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">Mean temperature (C)...</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">min_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">5</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+LoadAllClimateData_ -> TestClimateData_description_Mean_temperature_C_AprSep_max_missing_10_max_val_35_min_val_5;
+
+TestClimateData_description_Mean_temperature_C_AprSep_max_missing_10_max_val_35_min_val_5 -> TestAllClimateData_;
+
+TestClimateData_description_Mean_precipitation_mm_OctMar_max_missing_10_max_val_50_min_val_2 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestClimateData</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_missing</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">10</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">50</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">description</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">Mean precipitation (...</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">min_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">2</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+LoadAllClimateData_ -> TestClimateData_description_Mean_precipitation_mm_OctMar_max_missing_10_max_val_50_min_val_2;
+
+TestClimateData_description_Mean_precipitation_mm_OctMar_max_missing_10_max_val_50_min_val_2 -> TestAllClimateData_;
+
+TestClimateData_description_Mean_precipitation_mm_AprSep_max_missing_10_max_val_50_min_val_0 [label=< <TABLE BORDER="0" CELLSPACING="1" CELLPADDING="1"><TR><TD COLSPAN="2" ALIGN="CENTER"><FONT POINT-SIZE="12">TestClimateData</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_missing</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">10</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">max_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">50</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">description</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">Mean precipitation (...</FONT></TD></TR><TR><TD ALIGN="LEFT"><FONT POINT-SIZE="10">min_val</FONT></TD><TD ALIGN="LEFT"><FONT POINT-SIZE="10">0</FONT></TD></TR></TABLE> >, shape="rect", style="diagonals"];
+
+LoadAllClimateData_ -> TestClimateData_description_Mean_precipitation_mm_AprSep_max_missing_10_max_val_50_min_val_0;
+
+TestClimateData_description_Mean_precipitation_mm_AprSep_max_missing_10_max_val_50_min_val_0 -> TestAllClimateData_;
+
+TestAllClimateData_ -> Tests_;
+
+Tests_ -> LoadEverything_;
+
+}
