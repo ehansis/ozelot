@@ -142,6 +142,6 @@ Data for the examples are in the repository
 `ozelot-example-data <https://github.com/trycs/ozelot-example-data>`_.
 
 The compiled documentation (which you are currently viewing) is hosted
-on `readthedocs.org <https://readthedocs.org/>`_.
+on `readthedocs.org <http://ozelot.readthedocs.io/>`_.
 
 
