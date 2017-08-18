@@ -1,0 +1,8 @@
+name: ozelot-3.5
+dependencies:
+  - python=3.5
+  - numpy
+  - pandas
+  - lxml
+  - pip:
+    - git+https://github.com/ehansis/ozelot.git
