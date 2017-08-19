@@ -7,7 +7,7 @@ dependencies:
   - matplotlib
   - graphviz
   - pip:
-    - git+https://github.com/ehansis/ozelot.git
+    - git+https://github.com/trycs/ozelot.git
     - pygeoj
     - requests
     - jinja2
