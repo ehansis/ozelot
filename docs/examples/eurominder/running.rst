@@ -44,7 +44,7 @@ located in the example's folder to run
 
 .. code-block:: none
 
-    conda env crate -f eurominder-environment-2.7.yml
+    conda env create -f eurominder-environment-2.7.yml
 
 
 This will set up a new conda environment called ``ozelot-eurominder-2.7`` including all required packages.

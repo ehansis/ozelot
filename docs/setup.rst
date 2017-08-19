@@ -60,7 +60,7 @@ and run
 
 .. code-block:: none
 
-    conda env crate -f environment-2.7.yml
+    conda env create -f environment-2.7.yml
 
 
 This will set up a new conda environment called ``ozelot-2.7`` including all required packages.
