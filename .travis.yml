@@ -35,3 +35,4 @@ install:
 
 script:
   - nosetests ozelot.tests
+
