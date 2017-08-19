@@ -26,10 +26,11 @@ install:
   # Build conda environment
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
       conda env create -q -f travis-environment-2.7.yml;
+      source activate travis-environment-2.7;
     else
       conda env create -q -f travis-environment-3.5.yml;
+      source activate travis-environment-3.5;
     fi
-  - source activate test-environment
   - python setup.py install
 
 script:

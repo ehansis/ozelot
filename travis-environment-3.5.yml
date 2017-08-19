@@ -1,4 +1,4 @@
-name: test-environment
+name: travis-environment-3.5
 dependencies:
   - python=3.5
   - numpy

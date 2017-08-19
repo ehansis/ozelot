@@ -1,4 +1,4 @@
-name: test-environment
+name: travis-environment-2.7
 dependencies:
   - python=2.7
   - numpy
