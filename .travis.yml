@@ -35,4 +35,14 @@ install:
 
 script:
   - nosetests ozelot.tests
+  - cd examples/superheroes
+  - python manage.py getdata
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - cd ../eurominder
+  - python manage.py getdata
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
 
