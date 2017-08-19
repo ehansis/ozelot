@@ -3,8 +3,8 @@ Setting up and running the example
 ==================================
 
 
-Getting the example code
-------------------------
+Getting the example's code
+--------------------------
 
 The code for the example is located in the
 ``examples/superheroes`` directory of the `ozelot repository <https://github.com/trycs/ozelot>`_.
@@ -76,14 +76,14 @@ We provide a filled web cache with the example. This is useful, because
     2) it avoids unneccesary load on the data providers' servers, and
     3) you can be sure your results are consistent with the pipeline implementations and tests.
 
-To get the pre-filled cache, just run ``python manage.py getdata``.
+To get the pre-filled cache, run ``python manage.py getdata``.
 This downloads the data
 `from the 'ozelot-example-data' repository <https://github.com/trycs/ozelot-example-data/raw/master/superheroes/superheroes_web_cache.db.zip>`_
 and unzips it as ``superheroes_web_cache.db``.
 If you have changed the ``REQUEST_CACHE_PATH`` variable in ``project_config.py`` move/rename the file accordingly.
 
-Similarly, we provide the output database of a full pipeline run.
-You can also get it
+Also, we provide the output database of a full pipeline run.
+You can get it
 `from the 'ozelot-example-data' repository <https://github.com/trycs/ozelot-example-data/raw/master/superheroes/superheroes.db.zip>`_
 and unzip it. If you haven't changed the database configuration in ``project_config.py``, the file ``superheroes.db``
 should come to lie next to ``manage.py`` in the ``examples/superheroes`` folder.
@@ -94,7 +94,7 @@ should come to lie next to ``manage.py`` in the ``examples/superheroes`` folder.
 Running
 -------
 
-The example comes with a small script :file:`manage.py` that can be used to run initiate various operations.
+The example comes with a small script :file:`manage.py` that can be used to initiate various operations.
 
     - Run ``python manage.py getdata`` to download and unpack the pre-filled web cache (see above).
 

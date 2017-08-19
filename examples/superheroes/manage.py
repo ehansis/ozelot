@@ -44,7 +44,7 @@ if __name__ == '__main__':
 
     if args.command == 'getdata':
         url = "https://github.com/trycs/ozelot-example-data/raw/master/superheroes/superheroes_web_cache.db.zip"
-        out_path = path.join(path.dirname(__file__), url.split('/')[-1])
+        out_path = path.join(path.dirname(__file__), "superheroes_web_cache.db.zip")
 
         print ("Downloading and unpacking " + url + " ...")
         download_and_unzip(url, out_path)
