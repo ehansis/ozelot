@@ -9,5 +9,6 @@ dependencies:
   - pip:
     - git+https://github.com/ehansis/ozelot.git
     - pygeoj
+    - requests
     - jinja2
     - openpyxl
