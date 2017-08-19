@@ -1,0 +1,20 @@
+name: test-environment
+dependencies:
+  - numpy
+  - pandas
+  - lxml
+  - scipy
+  - matplotlib
+  - pip:
+    - sqlalchemy
+    - luigi
+    - keyring
+    - pygeoj
+    - jinja2
+    - openpyxl
+    - argparse
+    - requests
+    - xlrd
+    - seaborn
+    - sadisplay
+    - future
