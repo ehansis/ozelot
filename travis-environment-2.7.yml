@@ -19,3 +19,4 @@ dependencies:
     - seaborn
     - sadisplay
     - future
+    - nose
