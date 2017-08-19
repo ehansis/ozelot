@@ -1,0 +1,6 @@
+pygeoj
+matplotlib
+scipy
+jinja2
+openpyxl
+ozelot>=0.2

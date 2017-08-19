@@ -1,0 +1,2 @@
+conda:
+    file: docs/docs-environment-2.7.yml

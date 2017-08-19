@@ -99,3 +99,26 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# example data
+examples/eurominder/eurominder/data/air.mon.1981-2010.ltm.v301.nc
+examples/eurominder/eurominder/data/data.zip
+examples/eurominder/eurominder/data/NUTS_2013.csv
+examples/eurominder/eurominder/data/nuts_rg_60M_2013_lvl_2.geojson
+examples/eurominder/eurominder/data/precip.mon.ltm.v301.nc
+examples/eurominder/eurominder/data/tgs00005.tsv
+examples/eurominder/eurominder/data/tgs00010.tsv
+examples/eurominder/eurominder/data/tgs00024.tsv
+examples/eurominder/eurominder/data/tgs00038.tsv
+examples/eurominder/eurominder/data/tgs00058.tsv
+examples/eurominder/eurominder/data/tgs00059.tsv
+examples/eurominder/eurominder/data/tgs00100.tsv
+examples/eurominder/eurominder/data/tgs00101.tsv
+examples/superheroes/superheroes.db
+examples/superheroes/superheroes.db.zip
+examples/superheroes/superheroes_web_cache.db
+examples/superheroes/superheroes_web_cache.db.zip
+
+# PyCharm project conf
+.idea
+put_data_here.txt

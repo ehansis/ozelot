@@ -1,0 +1,6738 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <title>Marvel Movie Network</title>
+<style>
+body {
+  overflow:hidden;
+  margin: 20px;
+  font-family: sans-serif;
+}
+
+text {
+  font-family: sans-serif;
+  pointer-events: none;
+}
+
+</style>
+</head>
+<body>
+<h2>Marvel Movie Network</h2>
+<small>
+    <p>
+        <b>Squares</b>: movies, size scaled with inflation-adjusted budget, colored by rating.
+        <b>Circles</b>: characters.
+    </p>
+    <p>
+        <b>Zoom</b> in/out with mouse wheel (or similar). Drag on background to <b>pan</b>.
+        Double-click a node to <b>center</b> on it.
+        Shift+Click a node to go to <b>wiki page</b>.
+    </p>
+
+    <p>
+        Plotting code adapted from <a href="http://bl.ocks.org/eyaler/10586116" target="_blank">@eyaler,
+        http://bl.ocks.org/eyaler/10586116</a>. Many thanks!
+    </p>
+</small>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script>
+var w = window.innerWidth;
+var h = window.innerHeight;
+
+var keyc = true, keys = true, keyt = true, keyr = true, keyx = true, keyd = true, keyl = true, keym = true, keyh = true, key1 = true, key2 = true, key3 = true, key0 = true
+
+var focus_node = null, highlight_node = null;
+
+var text_center = false;
+var outline = false;
+
+var min_score = 0;
+var max_score = 1;
+
+var color = d3.scale.linear()
+  .domain([min_score, (min_score+max_score)/2, max_score])
+  .range(["red", "yellow", "lime"]);
+
+var highlight_color = "blue";
+var highlight_trans = 0.1;
+
+var size = d3.scale.pow().exponent(1)
+  .domain([1,100])
+  .range([8,24]);
+
+var force = d3.layout.force()
+  .linkDistance(60)
+  .charge(-300)
+  .size([w,h]);
+
+var default_node_color = "#ccc";
+//var default_node_color = "rgb(3,190,100)";
+var default_link_color = "#888";
+var nominal_base_node_size = 8;
+var nominal_text_size = 10;
+var max_text_size = 24;
+var nominal_stroke = 1.5;
+var max_stroke = 4.5;
+var max_base_node_size = 36;
+var min_zoom = 0.1;
+var max_zoom = 7;
+var svg = d3.select("body").append("svg");
+var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom])
+var g = svg.append("g");
+svg.style("cursor","move");
+
+var graph = {
+    "directed": false, 
+    "graph": [], 
+    "nodes": [
+        {
+            "url": "http://marvel.wikia.com/wiki/Captain_America_(1944_film)", 
+            "score": 0.6, 
+            "type": "square", 
+            "id": "Captain America (1944 film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/X2_(film)", 
+            "score": 0.75, 
+            "type": "square", 
+            "id": "X2 (film)", 
+            "size": 56.46467391304348
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Daredevil_(film)", 
+            "score": 0.53, 
+            "type": "square", 
+            "id": "Daredevil (film)", 
+            "size": 38.49864130434782
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/The_Amazing_Spider-Man_(2012_film)", 
+            "score": 0.7, 
+            "type": "square", 
+            "id": "The Amazing Spider-Man (2012 film)", 
+            "size": 88.44634441666595
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Iron_Man_(film)", 
+            "score": 0.79, 
+            "type": "square", 
+            "id": "Iron Man (film)", 
+            "size": 61.41577219081945
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/X-Men_(film)", 
+            "score": 0.74, 
+            "type": "square", 
+            "id": "X-Men (film)", 
+            "size": 41.136759581881535
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Spider-Man_3_(film)", 
+            "score": 0.62, 
+            "type": "square", 
+            "id": "Spider-Man 3 (film)", 
+            "size": 91.10551648966441
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Blade_(film)", 
+            "score": 0.71, 
+            "type": "square", 
+            "id": "Blade (film)", 
+            "size": 26.07515337423313
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Punisher:_War_Zone_(film)", 
+            "score": 0.6, 
+            "type": "square", 
+            "id": "Punisher: War Zone (film)", 
+            "size": 15.353943047704863
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/X-Men:_First_Class_(film)", 
+            "score": 0.78, 
+            "type": "square", 
+            "id": "X-Men: First Class (film)", 
+            "size": 50.386993807209954
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Howard_the_Duck_(film)", 
+            "score": 0.45999999999999996, 
+            "type": "square", 
+            "id": "Howard the Duck (film)", 
+            "size": 25.853102189781023
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/The_Incredible_Hulk_(2008_film)", 
+            "score": 0.6799999999999999, 
+            "type": "square", 
+            "id": "The Incredible Hulk (2008 film)", 
+            "size": 57.02893132004663
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Captain_Marvel_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Captain Marvel (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kick-Ass_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Kick-Ass (film)", 
+            "size": 12.128077191180246
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Venom_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Venom (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Iron_Man_3_(film)", 
+            "score": 0.72, 
+            "type": "square", 
+            "id": "Iron Man 3 (film)", 
+            "size": 81.0879260979494
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/New_Mutants_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "New Mutants (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Black_Panther_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Black Panther (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thor_(film)", 
+            "score": 0.7, 
+            "type": "square", 
+            "id": "Thor (film)", 
+            "size": 62.98374225901244
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Guardians_of_the_Galaxy_Vol._2_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Guardians of the Galaxy Vol. 2 (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Punisher_(2004_film)", 
+            "score": 0.65, 
+            "type": "square", 
+            "id": "Punisher (2004 film)", 
+            "size": 7.750000000000001
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hulk_(film)", 
+            "score": 0.5700000000000001, 
+            "type": "square", 
+            "id": "Hulk (film)", 
+            "size": 61.59782608695652
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/X-Men_Origins:_Wolverine_(film)", 
+            "score": 0.67, 
+            "type": "square", 
+            "id": "X-Men Origins: Wolverine (film)", 
+            "size": 66.03755995469314
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Man-Thing_(film)", 
+            "score": 0.41, 
+            "type": "square", 
+            "id": "Man-Thing (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Generation_X_(film)", 
+            "score": 0.47000000000000003, 
+            "type": "square", 
+            "id": "Generation X (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Iron_Man_2_(film)", 
+            "score": 0.7, 
+            "type": "square", 
+            "id": "Iron Man 2 (film)", 
+            "size": 73.63475437502292
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Power_Pack_(film)", 
+            "score": 0.51, 
+            "type": "square", 
+            "id": "Power Pack (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Captain_America_(1979_film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Captain America (1979 film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ghost_Rider_(film)", 
+            "score": 0.52, 
+            "type": "square", 
+            "id": "Ghost Rider (film)", 
+            "size": 50.10803406931543
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/The_Incredible_Hulk_(1977_film)", 
+            "score": 0.71, 
+            "type": "square", 
+            "id": "The Incredible Hulk (1977 film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Spider-Man_(1977_film)", 
+            "score": 0.5599999999999999, 
+            "type": "square", 
+            "id": "Spider-Man (1977 film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Dr._Strange_(film)", 
+            "score": 0.54, 
+            "type": "square", 
+            "id": "Dr. Strange (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/The_Amazing_Spider-Man_2_(film)", 
+            "score": 0.67, 
+            "type": "square", 
+            "id": "The Amazing Spider-Man 2 (film)", 
+            "size": 79.79352527710192
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/The_Wolverine_(film)", 
+            "score": 0.67, 
+            "type": "square", 
+            "id": "The Wolverine (film)", 
+            "size": 48.65275565876965
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/X-Men:_Days_of_Future_Past_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "X-Men: Days of Future Past (film)", 
+            "size": 79.79352527710192
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kick-Ass_2_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Kick-Ass 2 (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Logan_(film)", 
+            "score": 0.8400000000000001, 
+            "type": "square", 
+            "id": "Logan (film)", 
+            "size": 38.17242830417446
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Spider-Man_(2002_film)", 
+            "score": 0.73, 
+            "type": "square", 
+            "id": "Spider-Man (2002 film)", 
+            "size": 72.97693162868259
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Firearm_(film)", 
+            "score": 0.5599999999999999, 
+            "type": "square", 
+            "id": "Firearm (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hulk_Vs._(film)", 
+            "score": 0.71, 
+            "type": "square", 
+            "id": "Hulk Vs. (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Planet_Hulk_(film)", 
+            "score": 0.6799999999999999, 
+            "type": "square", 
+            "id": "Planet Hulk (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Doctor_Strange_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Doctor Strange (film)", 
+            "size": 64.93248113596687
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Fantastic_Four_(1994_film)", 
+            "score": 0.39, 
+            "type": "square", 
+            "id": "Fantastic Four (1994 film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elektra_(film)", 
+            "score": 0.48, 
+            "type": "square", 
+            "id": "Elektra (film)", 
+            "size": 20.795442908346132
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Fantastic_Four_(2015_film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Fantastic Four (2015 film)", 
+            "size": 48.61634397532667
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/The_Invincible_Iron_Man_(film)", 
+            "score": 0.6, 
+            "type": "square", 
+            "id": "The Invincible Iron Man (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Captain_America_(1990_film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Captain America (1990 film)", 
+            "size": 7.226472838561592
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Deadpool_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Deadpool (film)", 
+            "size": 22.824750944764112
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Spider-Man_2_(film)", 
+            "score": 0.73, 
+            "type": "square", 
+            "id": "Spider-Man 2 (film)", 
+            "size": 100.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Fantastic_Four_(2005_film)", 
+            "score": 0.5700000000000001, 
+            "type": "square", 
+            "id": "Fantastic Four (2005 film)", 
+            "size": 48.36149513568868
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Punisher_(1989_film)", 
+            "score": 0.5700000000000001, 
+            "type": "square", 
+            "id": "Punisher (1989 film)", 
+            "size": 6.934654919236419
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ant-Man_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Ant-Man (film)", 
+            "size": 51.8043009573153
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Big_Hero_6_(film)", 
+            "score": NaN, 
+            "type": "square", 
+            "id": "Big Hero 6 (film)", 
+            "size": 5.0
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Guardians_of_the_Galaxy_(film)", 
+            "score": 0.8099999999999999, 
+            "type": "square", 
+            "id": "Guardians of the Galaxy (film)", 
+            "size": 67.82449648553663
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/89P13_(Earth-199999)", 
+            "type": "circle", 
+            "id": "89P13", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abigail_Callaghan_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Abigail Callaghan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abigail_Miller_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Abigail Miller", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abraham_Cornelius_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Abraham Cornelius", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abraham_Cornelius_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Abraham Cornelius", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abraham_Erskine_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Abraham Erskine", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abraham_Whistler_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Abraham Whistler", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Abu_Bakaar_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Abu Bakaar", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Adam_Warlock_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Adam Warlock", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Agamotto_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Agamotto (Earth-199999)", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Aldrich_Killian_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Aldrich Killian", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Aleksei_Sytsevich_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Aleksei Sytsevich", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alexander_Power_(Earth-635972)", 
+            "type": "circle", 
+            "id": "Alexander Power", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alexander_Summers_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Alexander Summers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alexander_Summers_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Alexander Summers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alicia_Lee_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Alicia Lee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alicia_Masters_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Alicia Masters", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alison_Blaire_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Alison Blaire", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alistair_Krei_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Alistair Krei", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Alistair_Smythe_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Alistair Smythe", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Amara_Aquilla_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Amara Aquilla", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Amira_Ahmed_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Amira Ahmed", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Amora_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Amora", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ancient_One_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ancient One", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Andrea_von_Strucker_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Andrea von Strucker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Andreas_von_Strucker_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Andreas von Strucker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Angel_Salvadore_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Angel Salvadore", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Angela_Donatelli_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Angela Donatelli", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Angelo_Espinosa_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Angelo Espinosa", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Angelo_Espinosa_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Angelo Espinosa", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Angmo-Asan_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Angmo-Asan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Anthony_Stark_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Anthony Stark", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Anthony_Stark_(Earth-199673)", 
+            "type": "circle", 
+            "id": "Anthony Stark", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Anthony_Stark_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Anthony Stark", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Anton_Vanko_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Anton Vanko", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Arkady_Rossovich_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Arkady Rossovich", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Arlee_Hicks_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Arlee Hicks", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Arthur_Maddicks_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Arthur Maddicks", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ashley_Kafka_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Ashley Kafka", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Asmodeus_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Asmodeus", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Aunt_Cass_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Aunt Cass", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ayo_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ayo", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Azazel_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Azazel", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Balder_Odinson_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Balder Odinson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Balzaroth_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Balzaroth", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bambina_Arbogast_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Bambina Arbogast", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Baymax_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Baymax", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ben_Urich_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Ben Urich", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Benjamin_Grimm_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Benjamin Grimm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Benjamin_Grimm_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Benjamin Grimm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Benjamin_Parker_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Benjamin Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Benjamin_Parker_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Benjamin Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bereet_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Bereet", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bernard_Houseman_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Bernard Houseman", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Beta_Ray_Bill_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Beta Ray Bill", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Billy_James_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Billy James", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Billy_Russoti_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Billy Russoti", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Blackagar_Boltagon_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Blackagar Boltagon", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bob_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Bob", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bolivar_Trask_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Bolivar Trask", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bone_Saw_McGraw_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Bone Saw McGraw", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bor_Burison_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Bor Burison (Earth-199999)", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Broker_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Broker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bruce_Banner_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Bruce Banner", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bruce_Banner_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Bruce Banner", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Bruce_Banner_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Bruce Banner", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Brunnhilde_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Brunnhilde", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Caiera_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Caiera", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Caliban_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Caliban", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Calvin_Rankin_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Calvin Rankin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Captain_Barbera_(Earth-730911)", 
+            "type": "circle", 
+            "id": "Captain Barbera", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Carina_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Carina", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Carlos_Cruz_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Carlos Cruz", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Carmine_Gazzera_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Carmine Gazzera", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Carol_Frost_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Carol Frost", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Cash_Register_Thief_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Cash Register Thief", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Cassandra_Lang_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Cassandra Lang", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Cecilia_Reyes_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Cecilia Reyes", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Chad_Davis_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Chad Davis", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Charles_Xavier_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Charles Xavier", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Charles_Xavier_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Charles Xavier", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Chess_Roberts_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Chess Roberts", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Christine_Everhart_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Christine Everhart", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Christine_Palmer_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Christine Palmer", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Christopher_Bradley_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Christopher Bradley", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Clarice_Ferguson_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Clarice Ferguson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Claudette_St._Croix_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Claudette St. Croix", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Clea_Lake_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Clea Lake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Clinton_Barton_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Clinton Barton", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Cosmo_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Cosmo", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Cristu_Bulat_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Cristu Bulat", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Curtis_Connors_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Curtis Connors", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Curtis_Connors_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Curtis Connors", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Curtis_Webb_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Curtis Webb", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Dale_Rice_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Dale Rice", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Daniel_Drumm_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Daniel Drumm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Danielle_Moonstar_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Danielle Moonstar", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Daniels_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Daniels", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Darcy_Lewis_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Darcy Lewis", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Darren_Cross_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Darren Cross", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Dave_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Dave", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/David_Cunningham_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "David Cunningham", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/David_North_(Earth-10005)", 
+            "type": "circle", 
+            "id": "David North", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Deacon_Frost_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Deacon Frost", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Debbie_McIlvane_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Debbie McIlvane", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Dennis_Carradine_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Dennis Carradine", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Doctor_Shaw_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Doctor Shaw", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Doctor_Wu_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Doctor Wu", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Donald_Blake_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Donald Blake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Donald_Menken_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Donald Menken", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Donald_Pierce_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Donald Pierce", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Dopinder_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Dopinder", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Dormammu_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Dormammu", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Douglas_Ramsey_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Douglas Ramsey", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Drax_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Drax", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Duranna_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Duranna", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Edie_Lehnsherr_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Edie Lehnsherr", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Edward_Brock,_Jr._(Earth-96283)", 
+            "type": "circle", 
+            "id": "Edward Brock, Jr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Edward_Byron_(Earth-730911)", 
+            "type": "circle", 
+            "id": "Edward Byron", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elektra_Natchios_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Elektra Natchios", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elizabeth_Braddock_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Elizabeth Braddock", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elizabeth_Brant_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Elizabeth Brant", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elizabeth_Howlett_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Elizabeth Howlett", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elizabeth_Ross_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Elizabeth Ross", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elizabeth_Ross_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Elizabeth Ross", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ellen_Brandt_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ellen Brandt", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ellie_Phimister_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Ellie Phimister", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Elloe_Kaifi_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Elloe Kaifi", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Emil_Blonsky_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Emil Blonsky", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Emma_Frost_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Emma Frost", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Emma_Frost_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Emma Frost", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Emma_Marko_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Emma Marko", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Emma_Silverfox_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Emma Silverfox", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/En_Dwi_Gast_(Earth-10022)", 
+            "type": "circle", 
+            "id": "En Dwi Gast", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/En_Sabah_Nur_(Earth-10005)", 
+            "type": "circle", 
+            "id": "En Sabah Nur", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eric_Brooks_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Eric Brooks", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eric_Fraser_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Eric Fraser", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eric_Gitter_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Eric Gitter", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eric_Gitter_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Eric Gitter", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eric_Savin_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Eric Savin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Erik_Lehnsherr_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Erik Lehnsherr", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Erik_Lehnsherr_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Erik Lehnsherr", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Erik_Selvig_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Erik Selvig", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Eson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Estella_Espinosa_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Estella Espinosa", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ethel_Tomago_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Ethel Tomago", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eugene_Thompson_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Eugene Thompson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Eugene_Thompson_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Eugene Thompson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Everett_Ross_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Everett Ross", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Everett_Thomas_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Everett Thomas", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Fandral_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Fandral", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Fandral_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Fandral", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Father_Everett_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Father Everett", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Felicia_Hardy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Felicia Hardy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Fin_Fang_Foom_(Earth-199673)", 
+            "type": "circle", 
+            "id": "Fin Fang Foom", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Flea_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Flea", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Flint_Marko_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Flint Marko", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Forge_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Forge", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Francis_Freeman_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Francis Freeman", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frank_Castle_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Frank Castle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frank_Castle,_Jr._(Earth-58732)", 
+            "type": "circle", 
+            "id": "Frank Castle, Jr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frank_Castle,_Jr._(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Frank Castle, Jr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frank_Castle,_Sr._(Earth-58732)", 
+            "type": "circle", 
+            "id": "Frank Castle, Sr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Franklin_Nelson_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Franklin Nelson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Franklin_Richards_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Franklin Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Franklin_Storm_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Franklin Storm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frederick_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Frederick", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frederick_Dukes_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Frederick Dukes", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frederick_Schist_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Frederick Schist", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Frigga_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Frigga", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gale_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Gale", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gamora_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Gamora", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gamora_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Gamora", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Garrison_Kane_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Garrison Kane", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Garthan_Saal_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Garthan Saal", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gavin_Merchant_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Gavin Merchant", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/General_Nhuan_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "General Nhuan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/George_Stacy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "George Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/George_Stacy_(Earth-96283)", 
+            "type": "circle", 
+            "id": "George Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gitano_Dragonetti_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Gitano Dragonetti", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Grace_Donatelli_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Grace Donatelli", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Graymalkin_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Graymalkin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Groot_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Groot", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Grundroth_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Grundroth", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Guido_Carosella_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Guido Carosella", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gustav_Fiers_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Gustav Fiers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gwen_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Gwen", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gwendolyne_Stacy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Gwendolyne Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Gwendolyne_Stacy_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Gwendolyne Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hailstrum_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Hailstrum", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hamir_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Hamir", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Harley_Keener_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Harley Keener", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Harold_Hogan_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Harold Hogan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Harold_Osborn_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Harold Osborn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Harold_Osborn_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Harold Osborn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Harry_Heck_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Harry Heck", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Harvey_Allen_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Harvey Allen", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Heather_Glenn_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Heather Glenn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Heather_Hudson_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Heather Hudson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Heimdall_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Heimdall", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hela_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Hela", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Helen_Stacy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Helen Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Henry_Guyrich_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Henry Guyrich", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Henry_McCoy_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Henry McCoy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Henry_McCoy_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Henry McCoy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Henry_Pym_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Henry Pym", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hiro_Hamada_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Hiro Hamada", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hiroim_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Hiroim", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hitoshi_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Hitoshi", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ho_Yinsen_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ho Yinsen", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hogun_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Hogun", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hogun_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Hogun", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Honey_Lemon_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Honey Lemon", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hope_van_Dyne_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Hope van Dyne", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Horuz_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Horuz", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Howard_Saint_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Howard Saint", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Howard_Stacy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Howard Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Howard_Stark_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Howard Stark", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Howard_the_Duck_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Howard the Duck", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Hugin_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Hugin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Humanoid_Experimental_Robot_B-Type_Integrated_Electronics_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Humanoid Experimental Robot B-Type Integrated Electronics", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Illyana_Rasputin_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Illyana Rasputin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ink_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Ink", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Irani_Rael_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Irani Rael", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ivan_Vanko_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ivan Vanko", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jack_Hammer_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Jack Hammer", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jack_McGee_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Jack McGee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jack_Murdock_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Jack Murdock", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jack_Power_(Earth-635972)", 
+            "type": "circle", 
+            "id": "Jack Power", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jack_Taggart_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Jack Taggart", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jake_Schist_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Jake Schist", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jakob_Lehnsherr_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Jakob Lehnsherr", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Braddock,_Jr._(Earth-10005)", 
+            "type": "circle", 
+            "id": "James Braddock, Jr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Buchanan_Barnes_(Earth-199999)", 
+            "type": "circle", 
+            "id": "James Buchanan Barnes", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Howlett_(Earth-10005)", 
+            "type": "circle", 
+            "id": "James Howlett (Earth-10005)", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Howlett_(Earth-8096)", 
+            "type": "circle", 
+            "id": "James Howlett", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Howlett_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "James Howlett", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Madrox_(Earth-10005)", 
+            "type": "circle", 
+            "id": "James Madrox", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Paxton_(Earth-199999)", 
+            "type": "circle", 
+            "id": "James Paxton", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Proudstar_(Earth-10005)", 
+            "type": "circle", 
+            "id": "James Proudstar", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Rhodes_(Earth-199673)", 
+            "type": "circle", 
+            "id": "James Rhodes", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Rhodes_(Earth-199999)", 
+            "type": "circle", 
+            "id": "James Rhodes", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Russoti_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "James Russoti", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/James_Wilson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "James Wilson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jane_Foster_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Jane Foster", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Janet_van_Dyne_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Janet van Dyne", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Janos_Quested_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Janos Quested", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jason_Stryker_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Jason Stryker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jason_Stryker_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Jason Stryker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jasper_Sitwell_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Jasper Sitwell", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jean_Grey_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Jean Grey", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jean_Grey_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Jean Grey", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jeremy_Garrett_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Jeremy Garrett", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jim_Corley_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Jim Corley", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jim_Lee_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Jim Lee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jimmy_Grimm_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Jimmy Grimm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Joan_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Joan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Joe_Toro_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Joe Toro", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Allerdyce_(Earth-10005)", 
+            "type": "circle", 
+            "id": "John Allerdyce", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_F._Kennedy_(Earth-10005)", 
+            "type": "circle", 
+            "id": "John F. Kennedy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Howlett_(Earth-10005)", 
+            "type": "circle", 
+            "id": "John Howlett", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Jonah_Jameson_(Earth-120703)", 
+            "type": "circle", 
+            "id": "John Jonah Jameson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Jonah_Jameson_(Earth-730911)", 
+            "type": "circle", 
+            "id": "John Jonah Jameson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Jonah_Jameson_(Earth-96283)", 
+            "type": "circle", 
+            "id": "John Jonah Jameson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Jonah_Jameson_III_(Earth-96283)", 
+            "type": "circle", 
+            "id": "John Jonah Jameson III", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Saint_(Earth-58732)", 
+            "type": "circle", 
+            "id": "John Saint", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/John_Wraith_(Earth-10005)", 
+            "type": "circle", 
+            "id": "John Wraith", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jonathan_Pangborn_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Jonathan Pangborn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jonathan_Storm_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Jonathan Storm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jonathan_Storm_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Jonathan Storm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jones_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Jones", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Joseph_Robertson_(Earth-730911)", 
+            "type": "circle", 
+            "id": "Joseph Robertson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Joseph_Robertson_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Joseph Robertson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Joseph_Samuel_Greller_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Joseph Samuel Greller", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jubilation_Lee_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Jubilation Lee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Jubilation_Lee_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Jubilation Lee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Judy_Tyler_(Earth-730911)", 
+            "type": "circle", 
+            "id": "Judy Tyler", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Julie_Power_(Earth-635972)", 
+            "type": "circle", 
+            "id": "Julie Power", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Just_A_Rather_Very_Intelligent_System_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Just A Rather Very Intelligent System", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Justin_Hammer_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Justin Hammer", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kaecilius_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Kaecilius", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Karen_Jenson_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Karen Jenson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Karen_Page_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Karen Page", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Karl_Lykos_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Karl Lykos", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Karl_Mordo_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Karl Mordo", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Karman-Kan_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Karman-Kan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Katherine_Power_(Earth-635972)", 
+            "type": "circle", 
+            "id": "Katherine Power", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Katherine_Pryde_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Katherine Pryde", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Katherine_Pryde_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Katherine Pryde", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kathleen_Sparr_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Kathleen Sparr", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kayla_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Kayla", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kayla_Silverfox_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Kayla Silverfox", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Keniuchio_Harada_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Keniuchio Harada", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kevin_McTaggart_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Kevin McTaggart", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kirigi_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Kirigi", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Korath_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Korath", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Korg_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Korg", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kraglin_Obfonteri_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Kraglin Obfonteri", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kurt_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Kurt", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kurt_Pastorius_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Kurt Pastorius", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kurt_Wagner_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Kurt Wagner", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kyle_Gibney_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Kyle Gibney", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Kyle_Williams_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Kyle Williams", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/La_Magra_(Earth-26320)", 
+            "type": "circle", 
+            "id": "La Magra", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lance_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Lance", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Laufey_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Laufey", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Laura_Kinney_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Laura Kinney", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Laura_Kinney_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Laura Kinney", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lavin_Skee_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Lavin Skee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Leonard_Samson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Leonard Samson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lieutenant_Lacy_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Lieutenant Lacy (Earth-199999)", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lila_Cheney_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Lila Cheney", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Linus_Lieberman_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Linus Lieberman", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lisa_Castle_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Lisa Castle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Livia_Saint_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Livia Saint", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Loki_Laufeyson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Loki Laufeyson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Loki_Laufeyson_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Loki Laufeyson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lorna_Dane_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Lorna Dane", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lucas_Bishop_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Lucas Bishop", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lucian_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Lucian", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Luis_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Luis", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Lylla_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Lylla", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Madeline_Drake_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Madeline Drake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maggie_Lang_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Maggie Lang", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Malekith_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Malekith", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Man_in_Black_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Man in Black", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mandarin_(Earth-199673)", 
+            "type": "circle", 
+            "id": "Mandarin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Margaret_Carter_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Margaret Carter", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maria_Callasantos_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Maria Callasantos", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maria_Castle_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Maria Castle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maria_Castle_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Maria Castle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mariko_Yashida_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Mariko Yashida", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mark_Miller_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Mark Miller", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Martin_Soap_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Martin Soap", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mary_Fitzpatrick_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Mary Fitzpatrick", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mary_Jane_Watson_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Mary Jane Watson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mary_Walker_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Mary Walker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Matthew_Ellis_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Matthew Ellis", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Matthew_Murdock_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Matthew Murdock", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maximilian_Fargas_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Maximilian Fargas", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maxwell_Dillon_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Maxwell Dillon", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/May_Reilly_(Earth-120703)", 
+            "type": "circle", 
+            "id": "May Reilly", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/May_Reilly_(Earth-730911)", 
+            "type": "circle", 
+            "id": "May Reilly", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/May_Reilly_(Earth-96283)", 
+            "type": "circle", 
+            "id": "May Reilly", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Maya_Hansen_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Maya Hansen", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/McCabe_(Earth-701306)", 
+            "type": "circle", 
+            "id": "McCabe", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Meghan_Orlovsky_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Meghan Orlovsky", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mendel_Stromm_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Mendel Stromm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mercury_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Mercury", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Meredith_Quill_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Meredith Quill", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Michael_Ploog_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Michael Ploog", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mickey_Duka_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Mickey Duka", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Miek_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Miek", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mieko_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Mieko", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mike_Toro_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Mike Toro", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Missy_Kallenback_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Missy Kallenback", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mitchell_Carson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Mitchell Carson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mitchell_Laurio_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Mitchell Laurio", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Moira_MacTaggert_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Moira MacTaggert", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Moloka_Dar_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Moloka Dar", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mondo_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Mondo", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Monet_St._Croix_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Monet St. Croix", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Morgan_le_Fay_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Morgan le Fay", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mortimer_Toynbee_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Mortimer Toynbee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mortimer_Toynbee_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Mortimer Toynbee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mr._Kenny_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Mr. Kenny", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mr._Quill_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Mr. Quill", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mr._Richards_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Mr. Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mrs._Grimm_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Mrs. Grimm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mrs._Lieberman_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Mrs. Lieberman", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Mrs._Richards_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Mrs. Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ms._Maximoff_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Ms. Maximoff", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nameless_One_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Nameless One", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Natalia_Romanoff_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Natalia Romanoff", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nathan_Summers_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Nathan Summers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nathaniel_Bumpo_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Nathaniel Bumpo", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nathaniel_Essex_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Nathaniel Essex", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nebula_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Nebula", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nicholas_Fury_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Nicholas Fury", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nicky_Donatelli_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Nicky Donatelli", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nicodemus_West_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Nicodemus West", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nicole_St._Croix_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Nicole St. Croix", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Nikolas_Natchios_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Nikolas Natchios", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Noah_Tyler_(Earth-730911)", 
+            "type": "circle", 
+            "id": "Noah Tyler", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Noburo_Mori_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Noburo Mori", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Norman_Osborn_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Norman Osborn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Norman_Osborn_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Norman Osborn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Obadiah_Stane_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Obadiah Stane", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Odin_Borson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Odin Borson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Officer_Krieger_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Officer Krieger", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Omega_Red_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Omega Red", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ororo_Munroe_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Ororo Munroe", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ororo_Munroe_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Ororo Munroe", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Other_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Other", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Otto_Octavius_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Otto Octavius", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Paige_Guthrie_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Paige Guthrie", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Paul_Budiansky_(Earth-TRN011)", 
+            "type": "circle", 
+            "id": "Paul Budiansky", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peachy_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Peachy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Pearl_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Pearl", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Penny_Marko_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Penny Marko", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Horn_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Peter Horn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Maximoff_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Peter Maximoff", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Maximoff_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Peter Maximoff", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Parker_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Peter Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Parker_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Peter Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Parker_(Earth-730911)", 
+            "type": "circle", 
+            "id": "Peter Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Parker_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Peter Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Quill_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Peter Quill", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Quill_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Peter Quill", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Rasputin_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Peter Rasputin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Peter_Rasputin_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Peter Rasputin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Philip_Stacy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Philip Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Phillip_Coulson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Phillip Coulson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Phillip_Masters_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Phillip Masters", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Pip_Gofern_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Pip Gofern", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Quentin_Glass_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Quentin Glass", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Quinn_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Quinn", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Racquel_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Racquel", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Raggadorr_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Raggadorr", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rahne_Sinclair_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Rahne Sinclair", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rajit_Ratha_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Rajit Ratha", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ramone_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Ramone", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Raven_Darkholme_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Raven Darkholme", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Raven_Darkholme_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Raven Darkholme", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Raza_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Raza", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Recruiter_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Recruiter", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Reed_Richards_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Reed Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Reed_Richards_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Reed Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Reed_Richards_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Reed Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Remy_LeBeau_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Remy LeBeau", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rene_LaRoque_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Rene LaRoque", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rhomann_Dey_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Rhomann Dey", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Richard_Jones_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Richard Jones", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Richard_Nixon_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Richard Nixon", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Richard_Parker_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Richard Parker", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Robert_Drake_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Robert Drake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Robert_Drake_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Robert Drake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Robert_Kelly_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Robert Kelly", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Robert_Ralston_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Robert Ralston", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Robert_Saint_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Robert Saint", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Roberto_da_Costa_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Roberto da Costa", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rodney_Thibadeaux_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Rodney Thibadeaux", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rodrigo_Guevara_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Rodrigo Guevara", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ronan_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ronan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ronny_Drake_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Ronny Drake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Rosalie_Octavius_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Rosalie Octavius", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Russell_Tresh_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Russell Tresh", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Russian_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Russian", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ruth_Bat-Seraph_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Ruth Bat-Seraph", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sally_Avril_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Sally Avril", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sally_Blevins_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Sally Blevins", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Samuel_Guthrie_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Samuel Guthrie", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Samuel_Sterns_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Samuel Sterns", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Samuel_Wilson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Samuel Wilson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sarah_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Sarah", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Scott_Lang_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Scott Lang", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Scott_Summers_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Scott Summers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Scott_Summers_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Scott Summers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sean_Cassidy_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Sean Cassidy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sean_Cassidy_(Earth-700029)", 
+            "type": "circle", 
+            "id": "Sean Cassidy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sebastian_Shaw_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Sebastian Shaw", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Senator_Stern_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Senator Stern", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sharon_Xavier_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Sharon Xavier", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Shingen_Yashida_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Shingen Yashida", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Shiro_Yoshida_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Shiro Yoshida", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sif_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Sif", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sif_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Sif", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Simon_Stacy_(Earth-120703)", 
+            "type": "circle", 
+            "id": "Simon Stacy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Skurge_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Skurge", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Sleipnir_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Sleipnir", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Spacker_Dave_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Spacker Dave", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stan_Lee_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Stan Lee", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stanley_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Stanley", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stephen_Strange_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Stephen Strange", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stephen_Strange_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Stephen Strange", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stephen_Strange_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Stephen Strange", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stephen_Strange_(Earth-96283)", 
+            "type": "circle", 
+            "id": "Stephen Strange", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Steve_Gerber_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Steve Gerber", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Steven_Rogers_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Steven Rogers", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stick_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Stick", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Stone_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Stone", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Susan_Storm_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Susan Storm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Susan_Storm_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Susan Storm", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Tabitha_Smith_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Tabitha Smith", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Tadashi_Hamada_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Tadashi Hamada", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Taneleer_Tivan_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Taneleer Tivan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Teri_Elizabeth_Richards_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Teri Elizabeth Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thaddeus_Ross_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Thaddeus Ross", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thanos_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Thanos", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Theodore_Sallis_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Theodore Sallis", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Theresa_Cassidy_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Theresa Cassidy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thomas_Cassidy_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Thomas Cassidy", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thomas_Lindmer_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Thomas Lindmer", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thomas_Logan_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Thomas Logan", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thomas_Richards_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Thomas Richards", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thor_Odinson_(Earth-10022)", 
+            "type": "circle", 
+            "id": "Thor Odinson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thor_Odinson_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Thor Odinson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Thor_Odinson_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Thor Odinson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Tina_Minoru_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Tina Minoru", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Travis_Hudson_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Travis Hudson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Trevor_Slattery_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Trevor Slattery", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Truett_Hudson_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Truett Hudson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Tudo_Sokuto_(Earth-701306)", 
+            "type": "circle", 
+            "id": "Tudo Sokuto", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Ulysses_Klaue_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Ulysses Klaue", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Val_Mayerik_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Val Mayerik", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Vanessa_Brooks_(Earth-26320)", 
+            "type": "circle", 
+            "id": "Vanessa Brooks", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Vanessa_Carlysle_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Vanessa Carlysle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Vanessa_Carlysle_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Vanessa Carlysle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Vice_President_Rodriguez_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Vice President Rodriguez", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Victor_Creed_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Victor Creed", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Victor_Creed_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Victor Creed", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Victor_von_Doom_(Earth-121698)", 
+            "type": "circle", 
+            "id": "Victor von Doom", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Victor_von_Doom_(Earth-TRN554)", 
+            "type": "circle", 
+            "id": "Victor von Doom", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Virginia_Potts_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Virginia Potts", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Volstagg_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Volstagg", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Volstagg_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Volstagg", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wade_Wilson_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Wade Wilson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wade_Wilson_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Wade Wilson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wade_Wilson_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Wade Wilson", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wasabi_(Earth-14123)", 
+            "type": "circle", 
+            "id": "Wasabi", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wayne_Thibadeaux_(Earth-58460)", 
+            "type": "circle", 
+            "id": "Wayne Thibadeaux", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Will_Castle_(Earth-58732)", 
+            "type": "circle", 
+            "id": "Will Castle", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/William_Drake_(Earth-10005)", 
+            "type": "circle", 
+            "id": "William Drake", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/William_Gabriel_(Earth-199999)", 
+            "type": "circle", 
+            "id": "William Gabriel", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/William_Lumpkin_(Earth-121698)", 
+            "type": "circle", 
+            "id": "William Lumpkin", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/William_Stryker,_Jr._(Earth-10005)", 
+            "type": "circle", 
+            "id": "William Stryker, Jr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/William_Stryker,_Jr._(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "William Stryker, Jr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/William_Stryker,_Sr._(Earth-10005)", 
+            "type": "circle", 
+            "id": "William Stryker, Sr.", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wong_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Wong", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wong_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Wong", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Wong-Chu_(Earth-199673)", 
+            "type": "circle", 
+            "id": "Wong-Chu", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/X-24_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "X-24", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Yao_(Earth-96173)", 
+            "type": "circle", 
+            "id": "Yao", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Yashida_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Yashida", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Yondu_Udonta_(Earth-199999)", 
+            "type": "circle", 
+            "id": "Yondu Udonta", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Yukio_(Earth-10005)", 
+            "type": "circle", 
+            "id": "Yukio", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Yuriko_Oyama_(Earth-8096)", 
+            "type": "circle", 
+            "id": "Yuriko Oyama", 
+            "size": 10
+        }, 
+        {
+            "url": "http://marvel.wikia.com/wiki/Zander_Rice_(Earth-TRN414)", 
+            "type": "circle", 
+            "id": "Zander Rice", 
+            "size": 10
+        }
+    ], 
+    "links": [
+        {
+            "source": 1, 
+            "target": 133
+        }, 
+        {
+            "source": 1, 
+            "target": 288
+        }, 
+        {
+            "source": 1, 
+            "target": 445
+        }, 
+        {
+            "source": 1, 
+            "target": 304
+        }, 
+        {
+            "source": 1, 
+            "target": 510
+        }, 
+        {
+            "source": 1, 
+            "target": 489
+        }, 
+        {
+            "source": 1, 
+            "target": 354
+        }, 
+        {
+            "source": 1, 
+            "target": 312
+        }, 
+        {
+            "source": 1, 
+            "target": 476
+        }, 
+        {
+            "source": 1, 
+            "target": 194
+        }, 
+        {
+            "source": 1, 
+            "target": 463
+        }, 
+        {
+            "source": 1, 
+            "target": 341
+        }, 
+        {
+            "source": 1, 
+            "target": 328
+        }, 
+        {
+            "source": 1, 
+            "target": 209
+        }, 
+        {
+            "source": 1, 
+            "target": 91
+        }, 
+        {
+            "source": 1, 
+            "target": 544
+        }, 
+        {
+            "source": 1, 
+            "target": 324
+        }, 
+        {
+            "source": 1, 
+            "target": 167
+        }, 
+        {
+            "source": 1, 
+            "target": 411
+        }, 
+        {
+            "source": 1, 
+            "target": 160
+        }, 
+        {
+            "source": 1, 
+            "target": 257
+        }, 
+        {
+            "source": 1, 
+            "target": 376
+        }, 
+        {
+            "source": 1, 
+            "target": 498
+        }, 
+        {
+            "source": 1, 
+            "target": 576
+        }, 
+        {
+            "source": 1, 
+            "target": 71
+        }, 
+        {
+            "source": 1, 
+            "target": 74
+        }, 
+        {
+            "source": 1, 
+            "target": 78
+        }, 
+        {
+            "source": 1, 
+            "target": 79
+        }, 
+        {
+            "source": 1, 
+            "target": 82
+        }, 
+        {
+            "source": 1, 
+            "target": 123
+        }, 
+        {
+            "source": 1, 
+            "target": 131
+        }, 
+        {
+            "source": 1, 
+            "target": 140
+        }, 
+        {
+            "source": 1, 
+            "target": 150
+        }, 
+        {
+            "source": 1, 
+            "target": 156
+        }, 
+        {
+            "source": 1, 
+            "target": 174
+        }, 
+        {
+            "source": 1, 
+            "target": 203
+        }, 
+        {
+            "source": 1, 
+            "target": 211
+        }, 
+        {
+            "source": 1, 
+            "target": 218
+        }, 
+        {
+            "source": 1, 
+            "target": 221
+        }, 
+        {
+            "source": 1, 
+            "target": 227
+        }, 
+        {
+            "source": 1, 
+            "target": 235
+        }, 
+        {
+            "source": 1, 
+            "target": 238
+        }, 
+        {
+            "source": 1, 
+            "target": 275
+        }, 
+        {
+            "source": 1, 
+            "target": 291
+        }, 
+        {
+            "source": 1, 
+            "target": 286
+        }, 
+        {
+            "source": 1, 
+            "target": 337
+        }, 
+        {
+            "source": 1, 
+            "target": 346
+        }, 
+        {
+            "source": 1, 
+            "target": 347
+        }, 
+        {
+            "source": 1, 
+            "target": 355
+        }, 
+        {
+            "source": 1, 
+            "target": 365
+        }, 
+        {
+            "source": 1, 
+            "target": 371
+        }, 
+        {
+            "source": 1, 
+            "target": 382
+        }, 
+        {
+            "source": 1, 
+            "target": 417
+        }, 
+        {
+            "source": 1, 
+            "target": 430
+        }, 
+        {
+            "source": 1, 
+            "target": 435
+        }, 
+        {
+            "source": 1, 
+            "target": 444
+        }, 
+        {
+            "source": 1, 
+            "target": 449
+        }, 
+        {
+            "source": 1, 
+            "target": 473
+        }, 
+        {
+            "source": 1, 
+            "target": 483
+        }, 
+        {
+            "source": 1, 
+            "target": 494
+        }, 
+        {
+            "source": 1, 
+            "target": 502
+        }, 
+        {
+            "source": 1, 
+            "target": 504
+        }, 
+        {
+            "source": 1, 
+            "target": 505
+        }, 
+        {
+            "source": 1, 
+            "target": 518
+        }, 
+        {
+            "source": 1, 
+            "target": 537
+        }, 
+        {
+            "source": 1, 
+            "target": 545
+        }, 
+        {
+            "source": 1, 
+            "target": 560
+        }, 
+        {
+            "source": 1, 
+            "target": 563
+        }, 
+        {
+            "source": 1, 
+            "target": 570
+        }, 
+        {
+            "source": 2, 
+            "target": 392
+        }, 
+        {
+            "source": 2, 
+            "target": 173
+        }, 
+        {
+            "source": 2, 
+            "target": 101
+        }, 
+        {
+            "source": 2, 
+            "target": 217
+        }, 
+        {
+            "source": 2, 
+            "target": 336
+        }, 
+        {
+            "source": 2, 
+            "target": 206
+        }, 
+        {
+            "source": 2, 
+            "target": 281
+        }, 
+        {
+            "source": 2, 
+            "target": 436
+        }, 
+        {
+            "source": 2, 
+            "target": 251
+        }, 
+        {
+            "source": 3, 
+            "target": 457
+        }, 
+        {
+            "source": 3, 
+            "target": 241
+        }, 
+        {
+            "source": 3, 
+            "target": 104
+        }, 
+        {
+            "source": 3, 
+            "target": 395
+        }, 
+        {
+            "source": 3, 
+            "target": 231
+        }, 
+        {
+            "source": 3, 
+            "target": 474
+        }, 
+        {
+            "source": 3, 
+            "target": 488
+        }, 
+        {
+            "source": 3, 
+            "target": 200
+        }, 
+        {
+            "source": 3, 
+            "target": 145
+        }, 
+        {
+            "source": 3, 
+            "target": 129
+        }, 
+        {
+            "source": 3, 
+            "target": 239
+        }, 
+        {
+            "source": 3, 
+            "target": 388
+        }, 
+        {
+            "source": 3, 
+            "target": 409
+        }, 
+        {
+            "source": 3, 
+            "target": 503
+        }, 
+        {
+            "source": 3, 
+            "target": 255
+        }, 
+        {
+            "source": 3, 
+            "target": 270
+        }, 
+        {
+            "source": 3, 
+            "target": 521
+        }, 
+        {
+            "source": 3, 
+            "target": 465
+        }, 
+        {
+            "source": 3, 
+            "target": 439
+        }, 
+        {
+            "source": 3, 
+            "target": 496
+        }, 
+        {
+            "source": 4, 
+            "target": 87
+        }, 
+        {
+            "source": 4, 
+            "target": 295
+        }, 
+        {
+            "source": 4, 
+            "target": 246
+        }, 
+        {
+            "source": 4, 
+            "target": 567
+        }, 
+        {
+            "source": 4, 
+            "target": 263
+        }, 
+        {
+            "source": 4, 
+            "target": 332
+        }, 
+        {
+            "source": 4, 
+            "target": 441
+        }, 
+        {
+            "source": 4, 
+            "target": 478
+        }, 
+        {
+            "source": 4, 
+            "target": 61
+        }, 
+        {
+            "source": 4, 
+            "target": 577
+        }, 
+        {
+            "source": 4, 
+            "target": 364
+        }, 
+        {
+            "source": 4, 
+            "target": 136
+        }, 
+        {
+            "source": 4, 
+            "target": 271
+        }, 
+        {
+            "source": 4, 
+            "target": 466
+        }, 
+        {
+            "source": 4, 
+            "target": 432
+        }, 
+        {
+            "source": 4, 
+            "target": 75
+        }, 
+        {
+            "source": 5, 
+            "target": 304
+        }, 
+        {
+            "source": 5, 
+            "target": 133
+        }, 
+        {
+            "source": 5, 
+            "target": 288
+        }, 
+        {
+            "source": 5, 
+            "target": 445
+        }, 
+        {
+            "source": 5, 
+            "target": 510
+        }, 
+        {
+            "source": 5, 
+            "target": 491
+        }, 
+        {
+            "source": 5, 
+            "target": 170
+        }, 
+        {
+            "source": 5, 
+            "target": 285
+        }, 
+        {
+            "source": 5, 
+            "target": 256
+        }, 
+        {
+            "source": 5, 
+            "target": 341
+        }, 
+        {
+            "source": 5, 
+            "target": 328
+        }, 
+        {
+            "source": 5, 
+            "target": 489
+        }, 
+        {
+            "source": 5, 
+            "target": 312
+        }, 
+        {
+            "source": 6, 
+            "target": 460
+        }, 
+        {
+            "source": 6, 
+            "target": 389
+        }, 
+        {
+            "source": 6, 
+            "target": 242
+        }, 
+        {
+            "source": 6, 
+            "target": 397
+        }, 
+        {
+            "source": 6, 
+            "target": 317
+        }, 
+        {
+            "source": 6, 
+            "target": 326
+        }, 
+        {
+            "source": 6, 
+            "target": 175
+        }, 
+        {
+            "source": 6, 
+            "target": 146
+        }, 
+        {
+            "source": 6, 
+            "target": 248
+        }, 
+        {
+            "source": 6, 
+            "target": 210
+        }, 
+        {
+            "source": 6, 
+            "target": 171
+        }, 
+        {
+            "source": 6, 
+            "target": 232
+        }, 
+        {
+            "source": 6, 
+            "target": 105
+        }, 
+        {
+            "source": 6, 
+            "target": 453
+        }, 
+        {
+            "source": 6, 
+            "target": 185
+        }, 
+        {
+            "source": 6, 
+            "target": 440
+        }, 
+        {
+            "source": 6, 
+            "target": 159
+        }, 
+        {
+            "source": 6, 
+            "target": 107
+        }, 
+        {
+            "source": 6, 
+            "target": 201
+        }, 
+        {
+            "source": 6, 
+            "target": 448
+        }, 
+        {
+            "source": 7, 
+            "target": 189
+        }, 
+        {
+            "source": 7, 
+            "target": 335
+        }, 
+        {
+            "source": 7, 
+            "target": 60
+        }, 
+        {
+            "source": 7, 
+            "target": 559
+        }, 
+        {
+            "source": 7, 
+            "target": 402
+        }, 
+        {
+            "source": 7, 
+            "target": 470
+        }, 
+        {
+            "source": 7, 
+            "target": 233
+        }, 
+        {
+            "source": 7, 
+            "target": 157
+        }, 
+        {
+            "source": 7, 
+            "target": 471
+        }, 
+        {
+            "source": 7, 
+            "target": 452
+        }, 
+        {
+            "source": 7, 
+            "target": 147
+        }, 
+        {
+            "source": 7, 
+            "target": 357
+        }, 
+        {
+            "source": 7, 
+            "target": 443
+        }, 
+        {
+            "source": 8, 
+            "target": 213
+        }, 
+        {
+            "source": 8, 
+            "target": 387
+        }, 
+        {
+            "source": 8, 
+            "target": 450
+        }, 
+        {
+            "source": 8, 
+            "target": 366
+        }, 
+        {
+            "source": 8, 
+            "target": 126
+        }, 
+        {
+            "source": 8, 
+            "target": 110
+        }, 
+        {
+            "source": 8, 
+            "target": 127
+        }, 
+        {
+            "source": 8, 
+            "target": 276
+        }, 
+        {
+            "source": 8, 
+            "target": 296
+        }, 
+        {
+            "source": 8, 
+            "target": 144
+        }, 
+        {
+            "source": 8, 
+            "target": 433
+        }, 
+        {
+            "source": 8, 
+            "target": 81
+        }, 
+        {
+            "source": 8, 
+            "target": 234
+        }, 
+        {
+            "source": 8, 
+            "target": 423
+        }, 
+        {
+            "source": 8, 
+            "target": 384
+        }, 
+        {
+            "source": 8, 
+            "target": 367
+        }, 
+        {
+            "source": 8, 
+            "target": 215
+        }, 
+        {
+            "source": 9, 
+            "target": 194
+        }, 
+        {
+            "source": 9, 
+            "target": 133
+        }, 
+        {
+            "source": 9, 
+            "target": 476
+        }, 
+        {
+            "source": 9, 
+            "target": 257
+        }, 
+        {
+            "source": 9, 
+            "target": 67
+        }, 
+        {
+            "source": 9, 
+            "target": 512
+        }, 
+        {
+            "source": 9, 
+            "target": 412
+        }, 
+        {
+            "source": 9, 
+            "target": 379
+        }, 
+        {
+            "source": 9, 
+            "target": 514
+        }, 
+        {
+            "source": 9, 
+            "target": 183
+        }, 
+        {
+            "source": 9, 
+            "target": 300
+        }, 
+        {
+            "source": 9, 
+            "target": 96
+        }, 
+        {
+            "source": 9, 
+            "target": 80
+        }, 
+        {
+            "source": 9, 
+            "target": 170
+        }, 
+        {
+            "source": 9, 
+            "target": 285
+        }, 
+        {
+            "source": 9, 
+            "target": 516
+        }, 
+        {
+            "source": 9, 
+            "target": 581
+        }, 
+        {
+            "source": 9, 
+            "target": 579
+        }, 
+        {
+            "source": 9, 
+            "target": 313
+        }, 
+        {
+            "source": 9, 
+            "target": 288
+        }, 
+        {
+            "source": 11, 
+            "target": 118
+        }, 
+        {
+            "source": 11, 
+            "target": 177
+        }, 
+        {
+            "source": 11, 
+            "target": 363
+        }, 
+        {
+            "source": 11, 
+            "target": 526
+        }, 
+        {
+            "source": 11, 
+            "target": 506
+        }, 
+        {
+            "source": 11, 
+            "target": 541
+        }, 
+        {
+            "source": 11, 
+            "target": 343
+        }, 
+        {
+            "source": 11, 
+            "target": 327
+        }, 
+        {
+            "source": 11, 
+            "target": 182
+        }, 
+        {
+            "source": 11, 
+            "target": 87
+        }, 
+        {
+            "source": 11, 
+            "target": 432
+        }, 
+        {
+            "source": 11, 
+            "target": 486
+        }, 
+        {
+            "source": 11, 
+            "target": 59
+        }, 
+        {
+            "source": 11, 
+            "target": 297
+        }, 
+        {
+            "source": 11, 
+            "target": 280
+        }, 
+        {
+            "source": 15, 
+            "target": 87
+        }, 
+        {
+            "source": 15, 
+            "target": 246
+        }, 
+        {
+            "source": 15, 
+            "target": 567
+        }, 
+        {
+            "source": 15, 
+            "target": 332
+        }, 
+        {
+            "source": 15, 
+            "target": 295
+        }, 
+        {
+            "source": 15, 
+            "target": 245
+        }, 
+        {
+            "source": 15, 
+            "target": 398
+        }, 
+        {
+            "source": 15, 
+            "target": 64
+        }, 
+        {
+            "source": 15, 
+            "target": 193
+        }, 
+        {
+            "source": 15, 
+            "target": 179
+        }, 
+        {
+            "source": 15, 
+            "target": 554
+        }, 
+        {
+            "source": 15, 
+            "target": 562
+        }, 
+        {
+            "source": 15, 
+            "target": 263
+        }, 
+        {
+            "source": 15, 
+            "target": 161
+        }, 
+        {
+            "source": 15, 
+            "target": 99
+        }, 
+        {
+            "source": 15, 
+            "target": 283
+        }, 
+        {
+            "source": 15, 
+            "target": 132
+        }, 
+        {
+            "source": 15, 
+            "target": 391
+        }, 
+        {
+            "source": 15, 
+            "target": 548
+        }, 
+        {
+            "source": 15, 
+            "target": 550
+        }, 
+        {
+            "source": 15, 
+            "target": 118
+        }, 
+        {
+            "source": 17, 
+            "target": 95
+        }, 
+        {
+            "source": 17, 
+            "target": 557
+        }, 
+        {
+            "source": 17, 
+            "target": 202
+        }, 
+        {
+            "source": 18, 
+            "target": 550
+        }, 
+        {
+            "source": 18, 
+            "target": 298
+        }, 
+        {
+            "source": 18, 
+            "target": 196
+        }, 
+        {
+            "source": 18, 
+            "target": 152
+        }, 
+        {
+            "source": 18, 
+            "target": 442
+        }, 
+        {
+            "source": 18, 
+            "target": 223
+        }, 
+        {
+            "source": 18, 
+            "target": 519
+        }, 
+        {
+            "source": 18, 
+            "target": 204
+        }, 
+        {
+            "source": 18, 
+            "target": 264
+        }, 
+        {
+            "source": 18, 
+            "target": 568
+        }, 
+        {
+            "source": 18, 
+            "target": 253
+        }, 
+        {
+            "source": 18, 
+            "target": 359
+        }, 
+        {
+            "source": 18, 
+            "target": 237
+        }, 
+        {
+            "source": 18, 
+            "target": 243
+        }, 
+        {
+            "source": 18, 
+            "target": 369
+        }, 
+        {
+            "source": 18, 
+            "target": 523
+        }, 
+        {
+            "source": 18, 
+            "target": 273
+        }, 
+        {
+            "source": 18, 
+            "target": 273
+        }, 
+        {
+            "source": 18, 
+            "target": 115
+        }, 
+        {
+            "source": 18, 
+            "target": 466
+        }, 
+        {
+            "source": 18, 
+            "target": 303
+        }, 
+        {
+            "source": 18, 
+            "target": 142
+        }, 
+        {
+            "source": 18, 
+            "target": 432
+        }, 
+        {
+            "source": 18, 
+            "target": 162
+        }, 
+        {
+            "source": 18, 
+            "target": 87
+        }, 
+        {
+            "source": 19, 
+            "target": 462
+        }, 
+        {
+            "source": 19, 
+            "target": 168
+        }, 
+        {
+            "source": 19, 
+            "target": 226
+        }, 
+        {
+            "source": 19, 
+            "target": 54
+        }, 
+        {
+            "source": 19, 
+            "target": 236
+        }, 
+        {
+            "source": 19, 
+            "target": 588
+        }, 
+        {
+            "source": 19, 
+            "target": 431
+        }, 
+        {
+            "source": 19, 
+            "target": 277
+        }, 
+        {
+            "source": 20, 
+            "target": 214
+        }, 
+        {
+            "source": 20, 
+            "target": 216
+        }, 
+        {
+            "source": 20, 
+            "target": 383
+        }, 
+        {
+            "source": 20, 
+            "target": 575
+        }, 
+        {
+            "source": 20, 
+            "target": 310
+        }, 
+        {
+            "source": 20, 
+            "target": 524
+        }, 
+        {
+            "source": 20, 
+            "target": 429
+        }, 
+        {
+            "source": 20, 
+            "target": 405
+        }, 
+        {
+            "source": 20, 
+            "target": 493
+        }, 
+        {
+            "source": 20, 
+            "target": 469
+        }, 
+        {
+            "source": 20, 
+            "target": 319
+        }, 
+        {
+            "source": 20, 
+            "target": 269
+        }, 
+        {
+            "source": 20, 
+            "target": 368
+        }, 
+        {
+            "source": 20, 
+            "target": 408
+        }, 
+        {
+            "source": 20, 
+            "target": 311
+        }, 
+        {
+            "source": 20, 
+            "target": 249
+        }, 
+        {
+            "source": 20, 
+            "target": 501
+        }, 
+        {
+            "source": 22, 
+            "target": 288
+        }, 
+        {
+            "source": 22, 
+            "target": 483
+        }, 
+        {
+            "source": 22, 
+            "target": 345
+        }, 
+        {
+            "source": 22, 
+            "target": 320
+        }, 
+        {
+            "source": 22, 
+            "target": 579
+        }, 
+        {
+            "source": 22, 
+            "target": 563
+        }, 
+        {
+            "source": 22, 
+            "target": 570
+        }, 
+        {
+            "source": 22, 
+            "target": 221
+        }, 
+        {
+            "source": 22, 
+            "target": 156
+        }, 
+        {
+            "source": 22, 
+            "target": 288
+        }, 
+        {
+            "source": 22, 
+            "target": 547
+        }, 
+        {
+            "source": 22, 
+            "target": 314
+        }, 
+        {
+            "source": 22, 
+            "target": 176
+        }, 
+        {
+            "source": 22, 
+            "target": 138
+        }, 
+        {
+            "source": 22, 
+            "target": 510
+        }, 
+        {
+            "source": 22, 
+            "target": 186
+        }, 
+        {
+            "source": 22, 
+            "target": 133
+        }, 
+        {
+            "source": 22, 
+            "target": 301
+        }, 
+        {
+            "source": 22, 
+            "target": 252
+        }, 
+        {
+            "source": 22, 
+            "target": 553
+        }, 
+        {
+            "source": 22, 
+            "target": 57
+        }, 
+        {
+            "source": 22, 
+            "target": 128
+        }, 
+        {
+            "source": 23, 
+            "target": 356
+        }, 
+        {
+            "source": 23, 
+            "target": 190
+        }, 
+        {
+            "source": 23, 
+            "target": 307
+        }, 
+        {
+            "source": 23, 
+            "target": 558
+        }, 
+        {
+            "source": 23, 
+            "target": 540
+        }, 
+        {
+            "source": 23, 
+            "target": 404
+        }, 
+        {
+            "source": 23, 
+            "target": 454
+        }, 
+        {
+            "source": 23, 
+            "target": 484
+        }, 
+        {
+            "source": 23, 
+            "target": 543
+        }, 
+        {
+            "source": 23, 
+            "target": 284
+        }, 
+        {
+            "source": 23, 
+            "target": 531
+        }, 
+        {
+            "source": 23, 
+            "target": 222
+        }, 
+        {
+            "source": 23, 
+            "target": 495
+        }, 
+        {
+            "source": 23, 
+            "target": 574
+        }, 
+        {
+            "source": 23, 
+            "target": 109
+        }, 
+        {
+            "source": 23, 
+            "target": 508
+        }, 
+        {
+            "source": 24, 
+            "target": 329
+        }, 
+        {
+            "source": 24, 
+            "target": 83
+        }, 
+        {
+            "source": 24, 
+            "target": 415
+        }, 
+        {
+            "source": 24, 
+            "target": 90
+        }, 
+        {
+            "source": 24, 
+            "target": 414
+        }, 
+        {
+            "source": 24, 
+            "target": 353
+        }, 
+        {
+            "source": 24, 
+            "target": 184
+        }, 
+        {
+            "source": 24, 
+            "target": 513
+        }, 
+        {
+            "source": 24, 
+            "target": 500
+        }, 
+        {
+            "source": 24, 
+            "target": 492
+        }, 
+        {
+            "source": 24, 
+            "target": 358
+        }, 
+        {
+            "source": 24, 
+            "target": 69
+        }, 
+        {
+            "source": 24, 
+            "target": 308
+        }, 
+        {
+            "source": 24, 
+            "target": 344
+        }, 
+        {
+            "source": 24, 
+            "target": 198
+        }, 
+        {
+            "source": 25, 
+            "target": 87
+        }, 
+        {
+            "source": 25, 
+            "target": 246
+        }, 
+        {
+            "source": 25, 
+            "target": 567
+        }, 
+        {
+            "source": 25, 
+            "target": 295
+        }, 
+        {
+            "source": 25, 
+            "target": 332
+        }, 
+        {
+            "source": 25, 
+            "target": 271
+        }, 
+        {
+            "source": 25, 
+            "target": 427
+        }, 
+        {
+            "source": 25, 
+            "target": 432
+        }, 
+        {
+            "source": 25, 
+            "target": 466
+        }, 
+        {
+            "source": 25, 
+            "target": 278
+        }, 
+        {
+            "source": 25, 
+            "target": 333
+        }, 
+        {
+            "source": 25, 
+            "target": 136
+        }, 
+        {
+            "source": 25, 
+            "target": 88
+        }, 
+        {
+            "source": 25, 
+            "target": 135
+        }, 
+        {
+            "source": 25, 
+            "target": 515
+        }, 
+        {
+            "source": 25, 
+            "target": 99
+        }, 
+        {
+            "source": 26, 
+            "target": 331
+        }, 
+        {
+            "source": 26, 
+            "target": 340
+        }, 
+        {
+            "source": 26, 
+            "target": 282
+        }, 
+        {
+            "source": 26, 
+            "target": 66
+        }, 
+        {
+            "source": 30, 
+            "target": 459
+        }, 
+        {
+            "source": 30, 
+            "target": 316
+        }, 
+        {
+            "source": 30, 
+            "target": 325
+        }, 
+        {
+            "source": 30, 
+            "target": 396
+        }, 
+        {
+            "source": 30, 
+            "target": 330
+        }, 
+        {
+            "source": 30, 
+            "target": 172
+        }, 
+        {
+            "source": 30, 
+            "target": 124
+        }, 
+        {
+            "source": 30, 
+            "target": 437
+        }, 
+        {
+            "source": 31, 
+            "target": 529
+        }, 
+        {
+            "source": 31, 
+            "target": 141
+        }, 
+        {
+            "source": 31, 
+            "target": 583
+        }, 
+        {
+            "source": 31, 
+            "target": 416
+        }, 
+        {
+            "source": 31, 
+            "target": 426
+        }, 
+        {
+            "source": 31, 
+            "target": 98
+        }, 
+        {
+            "source": 31, 
+            "target": 93
+        }, 
+        {
+            "source": 31, 
+            "target": 586
+        }, 
+        {
+            "source": 31, 
+            "target": 546
+        }, 
+        {
+            "source": 31, 
+            "target": 472
+        }, 
+        {
+            "source": 32, 
+            "target": 457
+        }, 
+        {
+            "source": 32, 
+            "target": 241
+        }, 
+        {
+            "source": 32, 
+            "target": 488
+        }, 
+        {
+            "source": 32, 
+            "target": 395
+        }, 
+        {
+            "source": 32, 
+            "target": 65
+        }, 
+        {
+            "source": 32, 
+            "target": 394
+        }, 
+        {
+            "source": 32, 
+            "target": 247
+        }, 
+        {
+            "source": 32, 
+            "target": 163
+        }, 
+        {
+            "source": 32, 
+            "target": 439
+        }, 
+        {
+            "source": 32, 
+            "target": 207
+        }, 
+        {
+            "source": 32, 
+            "target": 239
+        }, 
+        {
+            "source": 32, 
+            "target": 73
+        }, 
+        {
+            "source": 32, 
+            "target": 145
+        }, 
+        {
+            "source": 32, 
+            "target": 388
+        }, 
+        {
+            "source": 32, 
+            "target": 104
+        }, 
+        {
+            "source": 32, 
+            "target": 231
+        }, 
+        {
+            "source": 32, 
+            "target": 270
+        }, 
+        {
+            "source": 32, 
+            "target": 255
+        }, 
+        {
+            "source": 32, 
+            "target": 465
+        }, 
+        {
+            "source": 32, 
+            "target": 315
+        }, 
+        {
+            "source": 32, 
+            "target": 92
+        }, 
+        {
+            "source": 33, 
+            "target": 288
+        }, 
+        {
+            "source": 33, 
+            "target": 589
+        }, 
+        {
+            "source": 33, 
+            "target": 385
+        }, 
+        {
+            "source": 33, 
+            "target": 346
+        }, 
+        {
+            "source": 33, 
+            "target": 587
+        }, 
+        {
+            "source": 33, 
+            "target": 517
+        }, 
+        {
+            "source": 33, 
+            "target": 438
+        }, 
+        {
+            "source": 33, 
+            "target": 288
+        }, 
+        {
+            "source": 33, 
+            "target": 304
+        }, 
+        {
+            "source": 33, 
+            "target": 445
+        }, 
+        {
+            "source": 33, 
+            "target": 407
+        }, 
+        {
+            "source": 33, 
+            "target": 262
+        }, 
+        {
+            "source": 33, 
+            "target": 194
+        }, 
+        {
+            "source": 33, 
+            "target": 133
+        }, 
+        {
+            "source": 34, 
+            "target": 133
+        }, 
+        {
+            "source": 34, 
+            "target": 445
+        }, 
+        {
+            "source": 34, 
+            "target": 288
+        }, 
+        {
+            "source": 34, 
+            "target": 194
+        }, 
+        {
+            "source": 34, 
+            "target": 258
+        }, 
+        {
+            "source": 34, 
+            "target": 134
+        }, 
+        {
+            "source": 34, 
+            "target": 372
+        }, 
+        {
+            "source": 34, 
+            "target": 293
+        }, 
+        {
+            "source": 34, 
+            "target": 494
+        }, 
+        {
+            "source": 34, 
+            "target": 489
+        }, 
+        {
+            "source": 34, 
+            "target": 341
+        }, 
+        {
+            "source": 34, 
+            "target": 463
+        }, 
+        {
+            "source": 34, 
+            "target": 139
+        }, 
+        {
+            "source": 34, 
+            "target": 477
+        }, 
+        {
+            "source": 34, 
+            "target": 456
+        }, 
+        {
+            "source": 34, 
+            "target": 113
+        }, 
+        {
+            "source": 34, 
+            "target": 580
+        }, 
+        {
+            "source": 34, 
+            "target": 195
+        }, 
+        {
+            "source": 34, 
+            "target": 191
+        }, 
+        {
+            "source": 34, 
+            "target": 476
+        }, 
+        {
+            "source": 34, 
+            "target": 579
+        }, 
+        {
+            "source": 34, 
+            "target": 290
+        }, 
+        {
+            "source": 34, 
+            "target": 240
+        }, 
+        {
+            "source": 34, 
+            "target": 475
+        }, 
+        {
+            "source": 34, 
+            "target": 192
+        }, 
+        {
+            "source": 34, 
+            "target": 418
+        }, 
+        {
+            "source": 34, 
+            "target": 68
+        }, 
+        {
+            "source": 34, 
+            "target": 151
+        }, 
+        {
+            "source": 34, 
+            "target": 313
+        }, 
+        {
+            "source": 34, 
+            "target": 455
+        }, 
+        {
+            "source": 34, 
+            "target": 96
+        }, 
+        {
+            "source": 34, 
+            "target": 80
+        }, 
+        {
+            "source": 34, 
+            "target": 183
+        }, 
+        {
+            "source": 34, 
+            "target": 512
+        }, 
+        {
+            "source": 34, 
+            "target": 425
+        }, 
+        {
+            "source": 34, 
+            "target": 230
+        }, 
+        {
+            "source": 34, 
+            "target": 487
+        }, 
+        {
+            "source": 34, 
+            "target": 302
+        }, 
+        {
+            "source": 34, 
+            "target": 304
+        }, 
+        {
+            "source": 34, 
+            "target": 510
+        }, 
+        {
+            "source": 34, 
+            "target": 257
+        }, 
+        {
+            "source": 34, 
+            "target": 258
+        }, 
+        {
+            "source": 34, 
+            "target": 490
+        }, 
+        {
+            "source": 34, 
+            "target": 342
+        }, 
+        {
+            "source": 34, 
+            "target": 464
+        }, 
+        {
+            "source": 34, 
+            "target": 446
+        }, 
+        {
+            "source": 34, 
+            "target": 305
+        }, 
+        {
+            "source": 34, 
+            "target": 511
+        }, 
+        {
+            "source": 34, 
+            "target": 134
+        }, 
+        {
+            "source": 34, 
+            "target": 188
+        }, 
+        {
+            "source": 36, 
+            "target": 288
+        }, 
+        {
+            "source": 36, 
+            "target": 361
+        }, 
+        {
+            "source": 36, 
+            "target": 122
+        }, 
+        {
+            "source": 36, 
+            "target": 134
+        }, 
+        {
+            "source": 36, 
+            "target": 164
+        }, 
+        {
+            "source": 36, 
+            "target": 591
+        }, 
+        {
+            "source": 36, 
+            "target": 585
+        }, 
+        {
+            "source": 36, 
+            "target": 464
+        }, 
+        {
+            "source": 36, 
+            "target": 446
+        }, 
+        {
+            "source": 36, 
+            "target": 511
+        }, 
+        {
+            "source": 36, 
+            "target": 148
+        }, 
+        {
+            "source": 36, 
+            "target": 290
+        }, 
+        {
+            "source": 37, 
+            "target": 460
+        }, 
+        {
+            "source": 37, 
+            "target": 389
+        }, 
+        {
+            "source": 37, 
+            "target": 248
+        }, 
+        {
+            "source": 37, 
+            "target": 105
+        }, 
+        {
+            "source": 37, 
+            "target": 397
+        }, 
+        {
+            "source": 37, 
+            "target": 440
+        }, 
+        {
+            "source": 37, 
+            "target": 159
+        }, 
+        {
+            "source": 37, 
+            "target": 201
+        }, 
+        {
+            "source": 37, 
+            "target": 317
+        }, 
+        {
+            "source": 37, 
+            "target": 326
+        }, 
+        {
+            "source": 37, 
+            "target": 175
+        }, 
+        {
+            "source": 37, 
+            "target": 171
+        }, 
+        {
+            "source": 37, 
+            "target": 107
+        }, 
+        {
+            "source": 37, 
+            "target": 114
+        }, 
+        {
+            "source": 37, 
+            "target": 401
+        }, 
+        {
+            "source": 37, 
+            "target": 393
+        }, 
+        {
+            "source": 37, 
+            "target": 146
+        }, 
+        {
+            "source": 39, 
+            "target": 119
+        }, 
+        {
+            "source": 39, 
+            "target": 551
+        }, 
+        {
+            "source": 39, 
+            "target": 289
+        }, 
+        {
+            "source": 39, 
+            "target": 520
+        }, 
+        {
+            "source": 39, 
+            "target": 178
+        }, 
+        {
+            "source": 39, 
+            "target": 370
+        }, 
+        {
+            "source": 39, 
+            "target": 76
+        }, 
+        {
+            "source": 39, 
+            "target": 58
+        }, 
+        {
+            "source": 39, 
+            "target": 564
+        }, 
+        {
+            "source": 39, 
+            "target": 571
+        }, 
+        {
+            "source": 39, 
+            "target": 89
+        }, 
+        {
+            "source": 39, 
+            "target": 590
+        }, 
+        {
+            "source": 39, 
+            "target": 555
+        }, 
+        {
+            "source": 39, 
+            "target": 360
+        }, 
+        {
+            "source": 39, 
+            "target": 205
+        }, 
+        {
+            "source": 39, 
+            "target": 265
+        }, 
+        {
+            "source": 39, 
+            "target": 569
+        }, 
+        {
+            "source": 39, 
+            "target": 97
+        }, 
+        {
+            "source": 39, 
+            "target": 254
+        }, 
+        {
+            "source": 39, 
+            "target": 120
+        }, 
+        {
+            "source": 39, 
+            "target": 522
+        }, 
+        {
+            "source": 39, 
+            "target": 378
+        }, 
+        {
+            "source": 40, 
+            "target": 117
+        }, 
+        {
+            "source": 40, 
+            "target": 350
+        }, 
+        {
+            "source": 40, 
+            "target": 261
+        }, 
+        {
+            "source": 40, 
+            "target": 406
+        }, 
+        {
+            "source": 40, 
+            "target": 181
+        }, 
+        {
+            "source": 40, 
+            "target": 121
+        }, 
+        {
+            "source": 40, 
+            "target": 362
+        }, 
+        {
+            "source": 40, 
+            "target": 108
+        }, 
+        {
+            "source": 40, 
+            "target": 84
+        }, 
+        {
+            "source": 40, 
+            "target": 85
+        }, 
+        {
+            "source": 40, 
+            "target": 480
+        }, 
+        {
+            "source": 40, 
+            "target": 527
+        }, 
+        {
+            "source": 40, 
+            "target": 111
+        }, 
+        {
+            "source": 40, 
+            "target": 549
+        }, 
+        {
+            "source": 40, 
+            "target": 187
+        }, 
+        {
+            "source": 40, 
+            "target": 461
+        }, 
+        {
+            "source": 40, 
+            "target": 225
+        }, 
+        {
+            "source": 40, 
+            "target": 62
+        }, 
+        {
+            "source": 40, 
+            "target": 468
+        }, 
+        {
+            "source": 41, 
+            "target": 528
+        }, 
+        {
+            "source": 41, 
+            "target": 77
+        }, 
+        {
+            "source": 41, 
+            "target": 338
+        }, 
+        {
+            "source": 41, 
+            "target": 244
+        }, 
+        {
+            "source": 41, 
+            "target": 582
+        }, 
+        {
+            "source": 41, 
+            "target": 149
+        }, 
+        {
+            "source": 41, 
+            "target": 552
+        }, 
+        {
+            "source": 41, 
+            "target": 137
+        }, 
+        {
+            "source": 41, 
+            "target": 334
+        }, 
+        {
+            "source": 41, 
+            "target": 373
+        }, 
+        {
+            "source": 41, 
+            "target": 166
+        }, 
+        {
+            "source": 41, 
+            "target": 434
+        }, 
+        {
+            "source": 41, 
+            "target": 321
+        }, 
+        {
+            "source": 41, 
+            "target": 63
+        }, 
+        {
+            "source": 41, 
+            "target": 550
+        }, 
+        {
+            "source": 41, 
+            "target": 369
+        }, 
+        {
+            "source": 41, 
+            "target": 442
+        }, 
+        {
+            "source": 43, 
+            "target": 173
+        }, 
+        {
+            "source": 43, 
+            "target": 533
+        }, 
+        {
+            "source": 43, 
+            "target": 399
+        }, 
+        {
+            "source": 43, 
+            "target": 56
+        }, 
+        {
+            "source": 43, 
+            "target": 386
+        }, 
+        {
+            "source": 43, 
+            "target": 556
+        }, 
+        {
+            "source": 43, 
+            "target": 348
+        }, 
+        {
+            "source": 43, 
+            "target": 534
+        }, 
+        {
+            "source": 43, 
+            "target": 390
+        }, 
+        {
+            "source": 43, 
+            "target": 436
+        }, 
+        {
+            "source": 44, 
+            "target": 482
+        }, 
+        {
+            "source": 44, 
+            "target": 103
+        }, 
+        {
+            "source": 44, 
+            "target": 536
+        }, 
+        {
+            "source": 44, 
+            "target": 323
+        }, 
+        {
+            "source": 44, 
+            "target": 219
+        }, 
+        {
+            "source": 44, 
+            "target": 250
+        }, 
+        {
+            "source": 44, 
+            "target": 566
+        }, 
+        {
+            "source": 44, 
+            "target": 419
+        }, 
+        {
+            "source": 44, 
+            "target": 309
+        }, 
+        {
+            "source": 44, 
+            "target": 422
+        }, 
+        {
+            "source": 44, 
+            "target": 424
+        }, 
+        {
+            "source": 44, 
+            "target": 421
+        }, 
+        {
+            "source": 45, 
+            "target": 86
+        }, 
+        {
+            "source": 45, 
+            "target": 294
+        }, 
+        {
+            "source": 45, 
+            "target": 380
+        }, 
+        {
+            "source": 45, 
+            "target": 208
+        }, 
+        {
+            "source": 45, 
+            "target": 584
+        }, 
+        {
+            "source": 47, 
+            "target": 572
+        }, 
+        {
+            "source": 47, 
+            "target": 464
+        }, 
+        {
+            "source": 47, 
+            "target": 180
+        }, 
+        {
+            "source": 47, 
+            "target": 279
+        }, 
+        {
+            "source": 47, 
+            "target": 561
+        }, 
+        {
+            "source": 47, 
+            "target": 212
+        }, 
+        {
+            "source": 47, 
+            "target": 479
+        }, 
+        {
+            "source": 47, 
+            "target": 112
+        }, 
+        {
+            "source": 47, 
+            "target": 165
+        }, 
+        {
+            "source": 47, 
+            "target": 290
+        }, 
+        {
+            "source": 47, 
+            "target": 134
+        }, 
+        {
+            "source": 47, 
+            "target": 258
+        }, 
+        {
+            "source": 47, 
+            "target": 229
+        }, 
+        {
+            "source": 47, 
+            "target": 306
+        }, 
+        {
+            "source": 47, 
+            "target": 400
+        }, 
+        {
+            "source": 47, 
+            "target": 570
+        }, 
+        {
+            "source": 47, 
+            "target": 155
+        }, 
+        {
+            "source": 47, 
+            "target": 525
+        }, 
+        {
+            "source": 47, 
+            "target": 428
+        }, 
+        {
+            "source": 48, 
+            "target": 460
+        }, 
+        {
+            "source": 48, 
+            "target": 389
+        }, 
+        {
+            "source": 48, 
+            "target": 248
+        }, 
+        {
+            "source": 48, 
+            "target": 397
+        }, 
+        {
+            "source": 48, 
+            "target": 105
+        }, 
+        {
+            "source": 48, 
+            "target": 317
+        }, 
+        {
+            "source": 48, 
+            "target": 326
+        }, 
+        {
+            "source": 48, 
+            "target": 175
+        }, 
+        {
+            "source": 48, 
+            "target": 171
+        }, 
+        {
+            "source": 48, 
+            "target": 146
+        }, 
+        {
+            "source": 48, 
+            "target": 318
+        }, 
+        {
+            "source": 48, 
+            "target": 107
+        }, 
+        {
+            "source": 48, 
+            "target": 499
+        }, 
+        {
+            "source": 48, 
+            "target": 440
+        }, 
+        {
+            "source": 48, 
+            "target": 530
+        }, 
+        {
+            "source": 49, 
+            "target": 481
+        }, 
+        {
+            "source": 49, 
+            "target": 535
+        }, 
+        {
+            "source": 49, 
+            "target": 322
+        }, 
+        {
+            "source": 49, 
+            "target": 102
+        }, 
+        {
+            "source": 49, 
+            "target": 70
+        }, 
+        {
+            "source": 49, 
+            "target": 578
+        }, 
+        {
+            "source": 49, 
+            "target": 565
+        }, 
+        {
+            "source": 49, 
+            "target": 158
+        }, 
+        {
+            "source": 49, 
+            "target": 274
+        }, 
+        {
+            "source": 49, 
+            "target": 467
+        }, 
+        {
+            "source": 51, 
+            "target": 509
+        }, 
+        {
+            "source": 51, 
+            "target": 259
+        }, 
+        {
+            "source": 51, 
+            "target": 374
+        }, 
+        {
+            "source": 51, 
+            "target": 154
+        }, 
+        {
+            "source": 51, 
+            "target": 352
+        }, 
+        {
+            "source": 51, 
+            "target": 267
+        }, 
+        {
+            "source": 51, 
+            "target": 130
+        }, 
+        {
+            "source": 51, 
+            "target": 292
+        }, 
+        {
+            "source": 51, 
+            "target": 224
+        }, 
+        {
+            "source": 51, 
+            "target": 410
+        }, 
+        {
+            "source": 51, 
+            "target": 153
+        }, 
+        {
+            "source": 51, 
+            "target": 271
+        }, 
+        {
+            "source": 51, 
+            "target": 381
+        }, 
+        {
+            "source": 51, 
+            "target": 451
+        }, 
+        {
+            "source": 51, 
+            "target": 377
+        }, 
+        {
+            "source": 51, 
+            "target": 87
+        }, 
+        {
+            "source": 51, 
+            "target": 299
+        }, 
+        {
+            "source": 51, 
+            "target": 507
+        }, 
+        {
+            "source": 51, 
+            "target": 532
+        }, 
+        {
+            "source": 51, 
+            "target": 458
+        }, 
+        {
+            "source": 51, 
+            "target": 287
+        }, 
+        {
+            "source": 52, 
+            "target": 260
+        }, 
+        {
+            "source": 52, 
+            "target": 199
+        }, 
+        {
+            "source": 52, 
+            "target": 573
+        }, 
+        {
+            "source": 52, 
+            "target": 266
+        }, 
+        {
+            "source": 52, 
+            "target": 220
+        }, 
+        {
+            "source": 52, 
+            "target": 100
+        }, 
+        {
+            "source": 52, 
+            "target": 538
+        }, 
+        {
+            "source": 52, 
+            "target": 94
+        }, 
+        {
+            "source": 52, 
+            "target": 72
+        }, 
+        {
+            "source": 52, 
+            "target": 55
+        }, 
+        {
+            "source": 53, 
+            "target": 462
+        }, 
+        {
+            "source": 53, 
+            "target": 226
+        }, 
+        {
+            "source": 53, 
+            "target": 54
+        }, 
+        {
+            "source": 53, 
+            "target": 236
+        }, 
+        {
+            "source": 53, 
+            "target": 168
+        }, 
+        {
+            "source": 53, 
+            "target": 588
+        }, 
+        {
+            "source": 53, 
+            "target": 351
+        }, 
+        {
+            "source": 53, 
+            "target": 268
+        }, 
+        {
+            "source": 53, 
+            "target": 485
+        }, 
+        {
+            "source": 53, 
+            "target": 277
+        }, 
+        {
+            "source": 53, 
+            "target": 228
+        }, 
+        {
+            "source": 53, 
+            "target": 497
+        }, 
+        {
+            "source": 53, 
+            "target": 349
+        }, 
+        {
+            "source": 53, 
+            "target": 497
+        }, 
+        {
+            "source": 53, 
+            "target": 431
+        }, 
+        {
+            "source": 53, 
+            "target": 447
+        }, 
+        {
+            "source": 53, 
+            "target": 542
+        }, 
+        {
+            "source": 53, 
+            "target": 420
+        }, 
+        {
+            "source": 53, 
+            "target": 403
+        }, 
+        {
+            "source": 53, 
+            "target": 106
+        }, 
+        {
+            "source": 53, 
+            "target": 413
+        }, 
+        {
+            "source": 53, 
+            "target": 116
+        }, 
+        {
+            "source": 53, 
+            "target": 375
+        }, 
+        {
+            "source": 53, 
+            "target": 339
+        }, 
+        {
+            "source": 53, 
+            "target": 169
+        }, 
+        {
+            "source": 53, 
+            "target": 539
+        }, 
+        {
+            "source": 53, 
+            "target": 125
+        }, 
+        {
+            "source": 53, 
+            "target": 143
+        }, 
+        {
+            "source": 53, 
+            "target": 272
+        }, 
+        {
+            "source": 53, 
+            "target": 197
+        }
+    ], 
+    "multigraph": true
+};
+
+var linkedByIndex = {};
+    graph.links.forEach(function(d) {
+	linkedByIndex[d.source + "," + d.target] = true;
+    });
+
+	function isConnected(a, b) {
+        return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
+    }
+
+	function hasConnections(a) {
+		for (var property in linkedByIndex) {
+				s = property.split(",");
+				if ((s[0] == a.index || s[1] == a.index) && linkedByIndex[property]) 					return true;
+		}
+	return false;
+	}
+
+  force
+    .nodes(graph.nodes)
+    .links(graph.links)
+    .start();
+
+  var link = g.selectAll(".link")
+    .data(graph.links)
+    .enter().append("line")
+    .attr("class", "link")
+	.style("stroke-width",nominal_stroke)
+	.style("stroke", function(d) {
+	if (isNumber(d.score) && d.score>=0) return color(d.score);
+	else return default_link_color; })
+
+
+  var node = g.selectAll(".node")
+    .data(graph.nodes)
+    .enter().append("g")
+    .attr("class", "node")
+
+    .call(force.drag)
+
+
+	node.on("dblclick.zoom", function(d) { d3.event.stopPropagation();
+	var dcx = (window.innerWidth/2-d.x*zoom.scale());
+	var dcy = (window.innerHeight/2-d.y*zoom.scale());
+	zoom.translate([dcx,dcy]);
+	 g.attr("transform", "translate("+ dcx + "," + dcy  + ")scale(" + zoom.scale() + ")");
+
+
+	});
+
+
+    node.on("click", function(d) {
+        if (d3.event.shiftKey) {
+            window.open(d.url, '_blank');
+        }
+    });
+
+
+
+	var tocolor = "fill";
+	var towhite = "stroke";
+	if (outline) {
+		tocolor = "stroke"
+		towhite = "fill"
+	}
+
+
+
+  var circle = node.append("path")
+
+
+      .attr("d", d3.svg.symbol()
+        .size(function(d) { return Math.PI*Math.pow(size(d.size)||nominal_base_node_size,2); })
+        .type(function(d) { return d.type; }))
+
+	.style(tocolor, function(d) {
+	if (isNumber(d.score) && d.score>=0) return color(d.score);
+	else return default_node_color; })
+    //.attr("r", function(d) { return size(d.size)||nominal_base_node_size; })
+	.style("stroke-width", nominal_stroke)
+	.style(towhite, "white");
+
+
+  var text = g.selectAll(".text")
+    .data(graph.nodes)
+    .enter().append("text")
+    .attr("dy", ".35em")
+	.style("font-size", nominal_text_size + "px")
+
+	if (text_center)
+	 text.text(function(d) { return d.id; })
+	.style("text-anchor", "middle");
+	else
+	text.attr("dx", function(d) {return (size(d.size)||nominal_base_node_size);})
+    .text(function(d) { return '\u2002'+d.id; });
+
+	node.on("mouseover", function(d) {
+	set_highlight(d);
+	})
+  .on("mousedown", function(d) { d3.event.stopPropagation();
+  	focus_node = d;
+	set_focus(d)
+	if (highlight_node === null) set_highlight(d)
+
+}	).on("mouseout", function(d) {
+		exit_highlight();
+
+}	);
+
+		d3.select(window).on("mouseup",
+		function() {
+		if (focus_node!==null)
+		{
+			focus_node = null;
+			if (highlight_trans<1)
+			{
+
+		circle.style("opacity", 1);
+	  text.style("opacity", 1);
+	  link.style("opacity", 1);
+	}
+		}
+
+	if (highlight_node === null) exit_highlight();
+		});
+
+function exit_highlight()
+{
+		highlight_node = null;
+	if (focus_node===null)
+	{
+		svg.style("cursor","move");
+		if (highlight_color!="white")
+	{
+  	  circle.style(towhite, "white");
+	  text.style("font-weight", "normal");
+	  link.style("stroke", function(o) {return (isNumber(o.score) && o.score>=0)?color(o.score):default_link_color});
+ }
+
+	}
+}
+
+function set_focus(d)
+{
+if (highlight_trans<1)  {
+    circle.style("opacity", function(o) {
+                return isConnected(d, o) ? 1 : highlight_trans;
+            });
+
+			text.style("opacity", function(o) {
+                return isConnected(d, o) ? 1 : highlight_trans;
+            });
+
+            link.style("opacity", function(o) {
+                return o.source.index == d.index || o.target.index == d.index ? 1 : highlight_trans;
+            });
+	}
+}
+
+
+function set_highlight(d)
+{
+	svg.style("cursor","pointer");
+	if (focus_node!==null) d = focus_node;
+	highlight_node = d;
+
+	if (highlight_color!="white")
+	{
+		  circle.style(towhite, function(o) {
+                return isConnected(d, o) ? highlight_color : "white";});
+			text.style("font-weight", function(o) {
+                return isConnected(d, o) ? "bold" : "normal";});
+            link.style("stroke", function(o) {
+		      return o.source.index == d.index || o.target.index == d.index ? highlight_color : ((isNumber(o.score) && o.score>=0)?color(o.score):default_link_color);
+
+            });
+	}
+}
+
+
+  zoom.on("zoom", function() {
+
+    var stroke = nominal_stroke;
+    if (nominal_stroke*zoom.scale()>max_stroke) stroke = max_stroke/zoom.scale();
+    link.style("stroke-width",stroke);
+    circle.style("stroke-width",stroke);
+
+	var base_radius = nominal_base_node_size;
+    if (nominal_base_node_size*zoom.scale()>max_base_node_size) base_radius = max_base_node_size/zoom.scale();
+        circle.attr("d", d3.svg.symbol()
+        .size(function(d) { return Math.PI*Math.pow(size(d.size)*base_radius/nominal_base_node_size||base_radius,2); })
+        .type(function(d) { return d.type; }))
+
+	//circle.attr("r", function(d) { return (size(d.size)*base_radius/nominal_base_node_size||base_radius); })
+	if (!text_center) text.attr("dx", function(d) { return (size(d.size)*base_radius/nominal_base_node_size||base_radius); });
+
+	var text_size = nominal_text_size;
+    if (nominal_text_size*zoom.scale()>max_text_size) text_size = max_text_size/zoom.scale();
+    text.style("font-size",text_size + "px");
+
+	g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+	});
+
+  svg.call(zoom);
+
+  resize();
+  //window.focus();
+  d3.select(window).on("resize", resize).on("keydown", keydown);
+
+  force.on("tick", function() {
+
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+    text.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
+
+    node.attr("cx", function(d) { return d.x; })
+      .attr("cy", function(d) { return d.y; });
+	});
+
+  function resize() {
+    var width = window.innerWidth, height = window.innerHeight;
+	svg.attr("width", width).attr("height", height);
+
+	force.size([force.size()[0]+(width-w)/zoom.scale(),force.size()[1]+(height-h)/zoom.scale()]).resume();
+    w = width;
+	h = height;
+	}
+
+	function keydown() {
+	if (d3.event.keyCode==32) {  force.stop();}
+	else if (d3.event.keyCode>=48 && d3.event.keyCode<=90 && !d3.event.ctrlKey && !d3.event.altKey && !d3.event.metaKey)
+	{
+  switch (String.fromCharCode(d3.event.keyCode)) {
+    case "C": keyc = !keyc; break;
+    case "S": keys = !keys; break;
+	case "T": keyt = !keyt; break;
+	case "R": keyr = !keyr; break;
+    case "X": keyx = !keyx; break;
+	case "D": keyd = !keyd; break;
+	case "L": keyl = !keyl; break;
+	case "M": keym = !keym; break;
+	case "H": keyh = !keyh; break;
+	case "1": key1 = !key1; break;
+	case "2": key2 = !key2; break;
+	case "3": key3 = !key3; break;
+	case "0": key0 = !key0; break;
+  }
+
+  link.style("display", function(d) {
+				var flag  = vis_by_type(d.source.type)&&vis_by_type(d.target.type)&&vis_by_node_score(d.source.score)&&vis_by_node_score(d.target.score)&&vis_by_link_score(d.score);
+				linkedByIndex[d.source.index + "," + d.target.index] = flag;
+              return flag?"inline":"none";});
+  node.style("display", function(d) {
+				return (key0||hasConnections(d))&&vis_by_type(d.type)&&vis_by_node_score(d.score)?"inline":"none";});
+  text.style("display", function(d) {
+                return (key0||hasConnections(d))&&vis_by_type(d.type)&&vis_by_node_score(d.score)?"inline":"none";});
+
+				if (highlight_node !== null)
+				{
+					if ((key0||hasConnections(highlight_node))&&vis_by_type(highlight_node.type)&&vis_by_node_score(highlight_node.score)) {
+					if (focus_node!==null) set_focus(focus_node);
+					set_highlight(highlight_node);
+					}
+					else {exit_highlight();}
+				}
+
+}
+}
+
+
+function vis_by_type(type)
+{
+	switch (type) {
+	  case "circle": return keyc;
+	  case "square": return keys;
+	  case "triangle-up": return keyt;
+	  case "diamond": return keyr;
+	  case "cross": return keyx;
+	  case "triangle-down": return keyd;
+	  default: return true;
+}
+}
+function vis_by_node_score(score)
+{
+	if (isNumber(score))
+	{
+	if (score>=0.666) return keyh;
+	else if (score>=0.333) return keym;
+	else if (score>=0) return keyl;
+	}
+	return true;
+}
+
+function vis_by_link_score(score)
+{
+	if (isNumber(score))
+	{
+	if (score>=0.666) return key3;
+	else if (score>=0.333) return key2;
+	else if (score>=0) return key1;
+}
+	return true;
+}
+
+function isNumber(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+
+</script>
+
+</body>

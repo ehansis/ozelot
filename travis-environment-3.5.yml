@@ -1,0 +1,23 @@
+name: travis-environment-3.5
+dependencies:
+  - python=3.5
+  - numpy
+  - pandas
+  - lxml
+  - scipy
+  - matplotlib
+  - pip:
+    - sqlalchemy
+    - luigi
+    - keyring
+    - pygeoj
+    - jinja2
+    - openpyxl
+    - argparse
+    - requests
+    - xlrd
+    - seaborn
+    - sadisplay
+    - future
+    - nose
+    - keyrings.alt

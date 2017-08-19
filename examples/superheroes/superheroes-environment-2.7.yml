@@ -1,0 +1,17 @@
+name: ozelot-superheroes-2.7
+dependencies:
+  - python=2.7
+  - numpy
+  - pandas
+  - lxml>=2.9.4
+  - scipy
+  - matplotlib
+  - graphviz
+  - pip:
+    - git+https://github.com/ehansis/ozelot.git
+    - argparse
+    - requests
+    - xlrd
+    - seaborn
+    - jinja2
+    - openpyxl

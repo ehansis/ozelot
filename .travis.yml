@@ -1,0 +1,52 @@
+# .travis.yml with conda modeled along https://conda.io/docs/user-guide/tasks/use-conda-with-travis-ci.html
+language: python
+
+python:
+  - "2.7"
+  - "3.5"
+
+before_install:
+  - sudo apt-get update
+  # start xvfb because matplotlib needs a DISPLAY (see https://docs.travis-ci.com/user/gui-and-headless-browsers/)
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+
+install:
+  # miniconda download and setup
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+
+  # Build conda environment
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      conda env create -q -f travis-environment-2.7.yml;
+      source activate travis-environment-2.7;
+    else
+      conda env create -q -f travis-environment-3.5.yml;
+      source activate travis-environment-3.5;
+    fi
+  - python setup.py install
+
+script:
+  - nosetests ozelot.tests
+  - cd examples/superheroes
+  - python manage.py getdata
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - cd ../eurominder
+  - python manage.py getdata
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+

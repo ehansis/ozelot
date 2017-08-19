@@ -1,0 +1,14 @@
+name: ozelot-eurominder-3.5
+dependencies:
+  - python=3.5
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - graphviz
+  - pip:
+    - git+https://github.com/ehansis/ozelot.git
+    - pygeoj
+    - requests
+    - jinja2
+    - openpyxl
