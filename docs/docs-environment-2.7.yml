@@ -22,3 +22,4 @@ dependencies:
     - sphinx
     - sphinxcontrib-napoleon
     - sphinx_rtd_theme
+    - rst2pdf
