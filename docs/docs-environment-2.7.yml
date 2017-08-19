@@ -19,3 +19,6 @@ dependencies:
     - seaborn
     - sadisplay
     - future
+    - sphinx
+    - sphinxcontrib-napoleon
+    - sphinx_rtd_theme
