@@ -5,6 +5,21 @@ from __future__ import absolute_import
 
 from os import path
 import argparse
+import requests
+import shutil
+import zipfile
+
+
+def download_and_unzip(url, out_path):
+    r = requests.get(url, stream=True)
+    if r.status_code == 200:
+        with open(out_path, 'wb') as f:
+            r.raw.decode_content = True
+            shutil.copyfileobj(r.raw, f)
+
+    zip_arch = zipfile.ZipFile(out_path, 'r')
+    zip_arch.extractall(path.dirname(out_path))
+    zip_arch.close()
 
 
 if __name__ == '__main__':
@@ -13,6 +28,7 @@ if __name__ == '__main__':
 
     # configure options
     parser.add_argument("command", help="Command to execute\n"
+                                        "\t'getdata':  download and unpack input data\n"
                                         "\t'initdb':   drop and re-create all database tables\n"
                                         "\t'ingest':   run the ingestion pipeline\n"
                                         "\t'analyze':  generate analysis\n"
@@ -26,7 +42,15 @@ if __name__ == '__main__':
 
     # do stuff
 
-    if args.command == 'initdb':
+    if args.command == 'getdata':
+        url = "https://github.com/trycs/ozelot-example-data/raw/master/superheroes/superheroes_web_cache.db.zip"
+        out_path = path.join(path.dirname(__file__), url.split('/')[-1])
+
+        print ("Downloading and unpacking " + url + " ...")
+        download_and_unzip(url, out_path)
+        print ("done.")
+
+    elif args.command == 'initdb':
         from superheroes import models
 
         print("Re-initializing the database ... ", end=' ')
