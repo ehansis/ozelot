@@ -79,7 +79,7 @@ To generate the documentation, run
     cd docs
     make html
 
-The generated html will be placed in a sub-directory ``build`` of the documentation directory.
+The generated html will be placed in a sub-directory ``_build`` of the documentation directory.
 
 When building the API documentation, :mod:`sphinx` needs to import all modules from all source files.
 Therefore, all required packages need to be installed to compile the documentation, both for
