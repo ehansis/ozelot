@@ -20,3 +20,4 @@ dependencies:
     - sadisplay
     - future
     - nose
+    - keyrings.alt
