@@ -1,5 +1,6 @@
 name: test-environment
 dependencies:
+  - python=2.7
   - numpy
   - pandas
   - lxml
