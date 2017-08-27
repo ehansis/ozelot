@@ -5,4 +5,4 @@ dependencies:
   - pandas
   - lxml
   - pip:
-    - git+https://github.com/trycs/ozelot.git
+    - ozelot

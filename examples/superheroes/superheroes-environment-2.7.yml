@@ -8,7 +8,7 @@ dependencies:
   - matplotlib
   - graphviz
   - pip:
-    - git+https://github.com/trycs/ozelot.git
+    - ozelot
     - argparse
     - requests
     - xlrd

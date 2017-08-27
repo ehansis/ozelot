@@ -35,7 +35,7 @@ Once you have Python up and running (and have your virtual environment activated
 
 .. code-block:: none
 
-    pip install git+https://github.com/trycs/ozelot.git
+    pip install ozelot
 
 If you are using anaconda, it is a good idea to install :mod:`numpy`, :mod:`scipy`, :mod:`pandas`,
 :mod:`matplotlib` and :mod:`lxml` via the conda package manager **before** installing :mod:`ozelot`
