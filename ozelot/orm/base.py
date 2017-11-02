@@ -14,6 +14,7 @@ Define derived classes like this::
     class MyModel(base.Base):
         my_field = Column(Integer())
 """
+import os
 from builtins import object
 
 from sqlalchemy import Column, Integer, func
@@ -194,7 +195,7 @@ def render_diagram(out_base):
               and its location configured in your `project_config.py` variable :attr:`DOT_EXECUTABLE`.
 
     Args:
-        out_base (srt): output base path (file endings will be appended)
+        out_base (str): output base path (file endings will be appended)
     """
     import codecs
     import subprocess
@@ -210,6 +211,12 @@ def render_diagram(out_base):
     # write description in DOT format
     with codecs.open(out_base + '.dot', 'w', encoding='utf-8') as f:
         f.write(sadisplay.dot(desc))
+
+    # check existence of DOT_EXECUTABLE variable and file
+    if not hasattr(config, 'DOT_EXECUTABLE'):
+        raise RuntimeError("Please configure the 'DOT_EXECUTABLE' variable in your 'project_config.py'")
+    if not os.path.exists(config.DOT_EXECUTABLE):
+        raise IOError("Could not find file pointed to by 'DOT_EXECUTABLE': " + str(config.DOT_EXECUTABLE))
 
     # render to image using DOT
     # noinspection PyUnresolvedReferences

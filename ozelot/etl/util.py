@@ -1,3 +1,6 @@
+import os
+
+
 """
 Utility functions for ETL pipelines
 """
@@ -95,6 +98,12 @@ def render_diagram(root_task, out_base, max_param_len=20, horizontal=False):
     # write description in DOT format
     with codecs.open(out_base + '.dot', 'w', encoding='utf-8') as f:
         f.write(u"\n".join(lines))
+
+    # check existence of DOT_EXECUTABLE variable and file
+    if not hasattr(config, 'DOT_EXECUTABLE'):
+        raise RuntimeError("Please configure the 'DOT_EXECUTABLE' variable in your 'project_config.py'")
+    if not os.path.exists(config.DOT_EXECUTABLE):
+        raise IOError("Could not find file pointed to by 'DOT_EXECUTABLE': " + str(config.DOT_EXECUTABLE))
 
     # render to image using DOT
     # noinspection PyUnresolvedReferences

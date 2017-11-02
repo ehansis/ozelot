@@ -2,6 +2,7 @@
 """
 from builtins import object
 
+import os
 import unittest
 
 import sqlalchemy as sa
@@ -9,6 +10,7 @@ from sqlalchemy import exc, select, orm, func
 
 from ozelot.tests import common
 from ozelot.orm import base
+from ozelot import config
 
 
 class MyModelA(base.Base):
@@ -49,7 +51,6 @@ class MyNotAModel(object):
 
 
 class BaseTest(unittest.TestCase):
-
     def setUp(self):
         common.remove_test_db_file()
         self.client = common.get_test_db_client()
@@ -272,3 +273,37 @@ class BaseTest(unittest.TestCase):
         for c in ['MyModelA', 'MyModelB', 'MyModelB2', 'MyModelC',
                   'MyModelValidation', 'MyBadMultipleInheritanceModel']:
             self.assertIn(c, list(base.model_registry.keys()))
+
+    def test11a(self):
+        """Test generation of .dot file for diagram and graceful failure if DOT_EXECUTABLE is not configured
+        """
+        out_base = "_test_diagram"
+
+        # un-set DOT_EXECUTABLE in config
+        del config.DOT_EXECUTABLE
+
+        # rendering diagram raises a runtime error
+        self.assertRaises(RuntimeError, base.render_diagram, out_base)
+
+        # dot file was still generated
+        self.assertTrue(os.path.exists(out_base + '.dot'))
+
+        # clean up
+        os.remove(out_base + '.dot')
+
+    def test11b(self):
+        """Test generation of .dot file for diagram and graceful failure if DOT_EXECUTABLE is configured wrong
+        """
+        out_base = "_test_diagram"
+
+        # set wrong DOT_EXECUTABLE in config
+        config.DOT_EXECUTABLE = "lala.la"
+
+        # rendering diagram raises a runtime error
+        self.assertRaises(IOError, base.render_diagram, out_base)
+
+        # dot file was still generated
+        self.assertTrue(os.path.exists(out_base + '.dot'))
+
+        # clean up
+        os.remove(out_base + '.dot')
