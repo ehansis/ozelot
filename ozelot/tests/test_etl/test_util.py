@@ -32,7 +32,18 @@ class TaskB(ORMTask):
 
 
 # noinspection PyAbstractClass
-class TaskC(ORMTask):
+class TaskC(luigi.Task):
+    def requires(self):
+        yield TaskD(p3=42)
+
+    def run(self):
+        pass
+
+
+# noinspection PyAbstractClass
+class TaskD(luigi.Task):
+    p3 = luigi.IntParameter()
+
     def run(self):
         pass
 
@@ -61,6 +72,8 @@ class TestFlowchart(unittest.TestCase):
         self.assertIn("p1", dot)
         self.assertIn("p2", dot)
         self.assertIn("TaskC", dot)
+        self.assertIn("TaskD", dot)
+        self.assertIn("p3", dot)
 
         # clean up
         os.remove(out_base + '.dot')
