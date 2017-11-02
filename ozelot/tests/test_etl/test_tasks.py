@@ -446,7 +446,6 @@ class TreeTask2A(TreeTaskBase):
     pass
 
 
-# luigi task - is not recursed over, so doesn't notice that TreeTask3A never completes
 class TreeTask2B(luigi.Task):
     def requires(self):
         yield TreeTask3A()
@@ -650,17 +649,21 @@ class TestTaskCheckCompletion(unittest.TestCase):
         self.assertIn("TreeTask3A {}", obj_ids)
 
     def test08a(self):
-        """Trying to mark incomplete a luigi.Task causes no error
+        """Trying to mark incomplete a luigi.Task causes no error (but its incomplete requirement is detected)
         """
         luigi.build([TreeTaskAll()], local_scheduler=True)
+        is_complete = check_completion(TreeTaskAll(), mark_incomplete=False)
+        self.assertTrue(is_complete)
         TreeTask3A().clear()
+        is_complete = check_completion(TreeTaskAll(), mark_incomplete=False)
+        self.assertFalse(is_complete)
         is_complete = check_completion(TreeTaskAll(), mark_incomplete=True)
         self.assertFalse(is_complete)
         is_complete = check_completion(TreeTask2B(), mark_incomplete=True)
         self.assertFalse(is_complete)
 
     def test08b(self):
-        """Trying to clear a luigi.Task causes no error
+        """Trying to clear a luigi.Task causes no error (but its incomplete requirement is detected)
         """
         luigi.build([TreeTaskAll()], local_scheduler=True)
         TreeTask3A().clear()
