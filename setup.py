@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='ozelot',
-      version='0.2.1',
+      version='0.2.2',
       description='A package for building maintanable ETL pipelines',
       classifiers=[
           'Development Status :: 3 - Alpha',
