@@ -7,6 +7,7 @@ import unittest
 import datetime
 
 import sqlalchemy as sa
+from sqlalchemy.orm import relationship
 import pandas as pd
 import luigi
 
@@ -403,6 +404,11 @@ class MyStringModel(base.Base):
     params = sa.Column(sa.String())
 
 
+class ModelWithForeignKey(base.Base):
+    rel_id = sa.Column(sa.Integer, sa.ForeignKey(MyStringModel.id))
+    rel = relationship(MyStringModel, backref="parent")
+
+
 # base with a run method
 class TreeTaskBase(ORMTask):
     def clear(self):
@@ -412,6 +418,7 @@ class TreeTaskBase(ORMTask):
             .filter(MyStringModel.params == self.get_param_string()) \
             .delete()
         s.commit()
+        s.close()
         self.mark_incomplete()
 
     def run(self):
@@ -419,14 +426,36 @@ class TreeTaskBase(ORMTask):
         s.add(MyStringModel(name=self.get_name(),
                             params=self.get_param_string()))
         s.commit()
+        s.close()
         self.mark_complete()
 
 
+# This is a task that creates a foreign key reference to an object created by one of its
+# requirements. If tasks are cleared in the naive order (bottom up), this fails, because
+# the requirement has to be cleared AFTER this task. Top-down clearing works.
 class TreeTaskAll(ORMWrapperTask):
     def requires(self):
         yield TreeTask1A(param='a')
         yield TreeTask1A(param='b')
         yield TreeTask1B()
+
+    def clear(self):
+        s = client.get_client().create_session()
+        s.query(ModelWithForeignKey).delete()
+        s.commit()
+        s.close()
+
+        super(TreeTaskAll, self).clear()
+
+    def run(self):
+        s = client.get_client().create_session()
+
+        rel_obj = s.query(MyStringModel).filter(MyStringModel.name == 'TreeTask1B').one()
+        s.add(ModelWithForeignKey(rel_id=rel_obj.id))
+        s.commit()
+        s.close()
+
+        super(TreeTaskAll, self).run()
 
 
 class TreeTask1A(TreeTaskBase):
@@ -446,7 +475,6 @@ class TreeTask2A(TreeTaskBase):
     pass
 
 
-# luigi task - is not recursed over, so doesn't notice that TreeTask3A never completes
 class TreeTask2B(luigi.Task):
     def requires(self):
         yield TreeTask3A()
@@ -468,6 +496,7 @@ class TestTaskCheckCompletion(unittest.TestCase):
         client.set_client(common.get_test_db_client())
         ORMTargetMarker().create_table(client.get_client())
         MyStringModel().create_table(client.get_client())
+        ModelWithForeignKey().create_table(client.get_client())
         self.session = client.get_client().create_session()
 
     def tearDown(self):
@@ -638,7 +667,10 @@ class TestTaskCheckCompletion(unittest.TestCase):
         self.assertEqual(self.session.query(ORMTargetMarker).count(), 5)
         self.assertEqual(self.session.query(MyStringModel).count(), 4)
 
-        # Task1B is cleared in addition, Task1A a + b objects remain
+        # Task1B is cleared in addition, Task1A a + b objects remain; to be able to do that without
+        # violating foreign key constraints, the model instance with foreign key has to be removed first
+        self.session.query(ModelWithForeignKey).delete()
+        self.session.commit()
         is_complete = check_completion(TreeTask1B(), clear=True)
         self.assertFalse(is_complete)
         self.assertEqual(self.session.query(ORMTargetMarker).count(), 4)
@@ -650,17 +682,21 @@ class TestTaskCheckCompletion(unittest.TestCase):
         self.assertIn("TreeTask3A {}", obj_ids)
 
     def test08a(self):
-        """Trying to mark incomplete a luigi.Task causes no error
+        """Trying to mark incomplete a luigi.Task causes no error (but its incomplete requirement is detected)
         """
         luigi.build([TreeTaskAll()], local_scheduler=True)
+        is_complete = check_completion(TreeTaskAll(), mark_incomplete=False)
+        self.assertTrue(is_complete)
         TreeTask3A().clear()
+        is_complete = check_completion(TreeTaskAll(), mark_incomplete=False)
+        self.assertFalse(is_complete)
         is_complete = check_completion(TreeTaskAll(), mark_incomplete=True)
         self.assertFalse(is_complete)
         is_complete = check_completion(TreeTask2B(), mark_incomplete=True)
         self.assertFalse(is_complete)
 
     def test08b(self):
-        """Trying to clear a luigi.Task causes no error
+        """Trying to clear a luigi.Task causes no error (but its incomplete requirement is detected)
         """
         luigi.build([TreeTaskAll()], local_scheduler=True)
         TreeTask3A().clear()

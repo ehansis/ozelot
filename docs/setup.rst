@@ -31,7 +31,7 @@ If you use a different Python distribution, set up your virtual environment usin
 Package installation
 ====================
 
-Once you have Python up and running (and have your virtual environment activated), install :mod:`ozelot` from GitHub:
+Once you have Python up and running (and have your virtual environment activated), install :mod:`ozelot` via ``pip``:
 
 .. code-block:: none
 

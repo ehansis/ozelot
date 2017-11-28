@@ -172,6 +172,12 @@ class ORMTestTask(ORMTask):
         super(ORMTestTask, self).done(commit)
 
 
+# helper function: increment a stats counter
+def _increment_stats(stats, label):
+    count = stats.setdefault(label, 0)
+    stats[label] = count + 1
+
+
 def check_completion(task, mark_incomplete=False, clear=False, return_stats=False):
     """Recursively check if a task and all its requirements are complete
 
@@ -194,11 +200,44 @@ def check_completion(task, mark_incomplete=False, clear=False, return_stats=Fals
             are complete, ``False`` otherwise.
     """
     # run recursive task checking, get stats
+    to_clear = dict()
     is_complete, stats = _check_completion(task,
                                            mark_incomplete=mark_incomplete,
                                            clear=clear,
                                            stats={},
-                                           visited=dict())
+                                           visited=dict(),
+                                           to_clear=to_clear)
+
+    # task clearing needs to happen top-down: because of foreign key constraints, a task can
+    # only be cleared once all tasks that require it have been cleared
+    while to_clear:
+        # find all tasks that we can currently clear - tasks not required by other tasks;
+        # iterate over list of keys to be able to modify dict while iterating
+        found_clearable_task = False
+        for task_id in list(to_clear.keys()):
+            v = to_clear[task_id]
+            if not v['required_by']:
+                # this is a task that can be cleared - no other task requires it
+                found_clearable_task = True
+
+                task = v['task']
+                if isinstance(task, ORMTask):
+                    task.mark_incomplete()
+                    task.clear()
+                    _increment_stats(stats, 'Cleared')
+                    config.logger.info("Cleared task: " + task_id)
+                else:
+                    config.logger.info('Cannot clear task, not an ORMTask: ' + task_id)
+
+                # remove the task from the list of tasks that need clearing, remove references
+                # in the required_by lists of all other tasks; this is not an efficient implementation,
+                # O(n^2), could be made O(n) using lookup tables of the task graph
+                del to_clear[task_id]
+                for w in to_clear.values():
+                    w['required_by'].discard(task_id)
+
+        if not found_clearable_task:
+            raise RuntimeError("Error in recursive task clearing, no clearable task found")
 
     config.logger.info("Task completion checking, summary:\n" + str(stats))
 
@@ -208,10 +247,12 @@ def check_completion(task, mark_incomplete=False, clear=False, return_stats=Fals
         return is_complete
 
 
-def _check_completion(task, mark_incomplete, clear, stats, visited):
+def _check_completion(task, mark_incomplete, clear, stats, visited, to_clear):
     """Core recursion function for :func:`check_completion`, see there for more documentation
 
     Args:
+        task (luigi.Task): task instance
+
         mark_incomplete (bool): see :func:`check_completion`
 
         clear (bool): see :func:`check_completion`
@@ -220,10 +261,16 @@ def _check_completion(task, mark_incomplete, clear, stats, visited):
 
         visited (dict): cache for visited tasks: key = task name + parameter string, value = completion status
 
+        to_clear (dict): dict of dicts of tasks to be cleared, key = task id,
+            value =  {task: task instance object, required_by: set of task IDs that this task is required by}
+
     """
     # is this task (recursively) complete?
     task_complete = task.complete()
     is_complete = task_complete
+
+    # task identification: task name plus parameters
+    task_id = get_task_name(task) + ' ' + get_task_param_string(task)
 
     # check any requirements
     for req in task.requires():
@@ -235,50 +282,44 @@ def _check_completion(task, mark_incomplete, clear, stats, visited):
         if req_id in visited:
             req_complete = visited[req_id]
         else:
-            req_complete, _ = _check_completion(req,
+            req_complete, _ = _check_completion(task=req,
                                                 mark_incomplete=mark_incomplete,
                                                 clear=clear,
                                                 stats=stats,
-                                                visited=visited)
+                                                visited=visited,
+                                                to_clear=to_clear)
             visited[req_id] = req_complete
 
+        # add any incomplete requirements to the list of tasks to clear, noting the current task as parent (required by)
+        if clear and not req_complete:
+            clear_entry = to_clear.setdefault(req_id, dict(task=req, required_by=set()))
+            clear_entry['required_by'].add(task_id)
+
         is_complete &= req_complete
-
-    # helper function: increment a stats counter
-    def increment_stats(label):
-        count = stats.setdefault(label, 0)
-        stats[label] = count + 1
-
-    # task identification: task name plus parameters
-    task_id = get_task_name(task) + ' ' + get_task_param_string(task)
 
     if not is_complete:
         if task_complete:
             config.logger.info("Task complete but requirements incomplete: " + task_id)
         else:
             config.logger.info("Task incomplete: " + task_id)
-        increment_stats('Incomplete tasks')
+        _increment_stats(stats, 'Incomplete tasks')
 
         if mark_incomplete:
             if isinstance(task, ORMTask):
                 task.mark_incomplete()
-                increment_stats('Marked incomplete')
+                _increment_stats(stats, 'Marked incomplete')
                 config.logger.info("Marked task incomplete: " + task_id)
             else:
                 config.logger.info('Cannot mark task incomplete, not an ORMTask: ' + task_id)
 
-        if clear:
-            if isinstance(task, ORMTask):
-                task.mark_incomplete()
-                task.clear()
-                increment_stats('Cleared')
-                config.logger.info("Cleared task: " + task_id)
-            else:
-                config.logger.info('Cannot clear task, not an ORMTask: ' + task_id)
-
     else:
-        increment_stats('Complete tasks')
+        _increment_stats(stats, 'Complete tasks')
         config.logger.debug("Task complete: " + task_id)
+
+    # if we want to clear and the current task is not in the dict of tasks to clear,
+    # it is the root task, add it with no parent (required by) tasks
+    if clear and not is_complete and task_id not in to_clear:
+        to_clear[task_id] = dict(task=task, required_by=set())
 
     return is_complete, stats
 
