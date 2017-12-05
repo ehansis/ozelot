@@ -7,7 +7,6 @@ import unittest
 import luigi
 
 from ozelot.etl.tasks import ORMTask
-from ozelot.orm import base
 from ozelot import config
 from ozelot.etl import util
 
@@ -21,6 +20,9 @@ class TaskA(ORMTask):
     def run(self):
         pass
 
+    def complete(self):
+        return False
+
 
 # noinspection PyAbstractClass
 class TaskB(ORMTask):
@@ -29,6 +31,9 @@ class TaskB(ORMTask):
 
     def run(self):
         pass
+
+    def complete(self):
+        return False
 
 
 # noinspection PyAbstractClass
@@ -39,6 +44,9 @@ class TaskC(luigi.Task):
     def run(self):
         pass
 
+    def complete(self):
+        return False
+
 
 # noinspection PyAbstractClass
 class TaskD(luigi.Task):
@@ -47,8 +55,12 @@ class TaskD(luigi.Task):
     def run(self):
         pass
 
+    def complete(self):
+        return False
+
 
 class TestFlowchart(unittest.TestCase):
+
     def test01a(self):
         """Test generation of .dot file for diagram and graceful failure if DOT_EXECUTABLE is not configured
         """
@@ -74,6 +86,7 @@ class TestFlowchart(unittest.TestCase):
         self.assertIn("TaskC", dot)
         self.assertIn("TaskD", dot)
         self.assertIn("p3", dot)
+        self.assertNotIn("red", dot)
 
         # clean up
         os.remove(out_base + '.dot')
@@ -91,6 +104,26 @@ class TestFlowchart(unittest.TestCase):
 
         # dot file was still generated
         self.assertTrue(os.path.exists(out_base + '.dot'))
+
+        # clean up
+        os.remove(out_base + '.dot')
+
+    def test01c(self):
+        """Test generation of colored .dot file
+        """
+        out_base = "_test_diagram"
+
+        # un-set DOT_EXECUTABLE in config
+        del config.DOT_EXECUTABLE
+
+        # rendering diagram raises a runtime error
+        self.assertRaises(RuntimeError, util.render_diagram, TaskA(), out_base, colored=True)
+
+        with open(out_base + '.dot') as f:
+            dot = f.read()
+
+        self.assertIn("red", dot)
+        self.assertNotIn("green", dot)
 
         # clean up
         os.remove(out_base + '.dot')
