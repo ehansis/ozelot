@@ -67,7 +67,8 @@ class TestFlowchart(unittest.TestCase):
         out_base = "_test_diagram"
 
         # un-set DOT_EXECUTABLE in config
-        del config.DOT_EXECUTABLE
+        if hasattr(config, 'DOT_EXECUTABLE'):
+            del config.DOT_EXECUTABLE
 
         # rendering diagram raises a runtime error
         self.assertRaises(RuntimeError, util.render_diagram, TaskA(), out_base)
@@ -114,7 +115,8 @@ class TestFlowchart(unittest.TestCase):
         out_base = "_test_diagram"
 
         # un-set DOT_EXECUTABLE in config
-        del config.DOT_EXECUTABLE
+        if hasattr(config, 'DOT_EXECUTABLE'):
+            del config.DOT_EXECUTABLE
 
         # rendering diagram raises a runtime error
         self.assertRaises(RuntimeError, util.render_diagram, TaskA(), out_base, colored=True)
