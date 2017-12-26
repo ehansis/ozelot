@@ -1,11 +1,11 @@
 """Data models for project 'leonardo', standard version
 """
 
-from sqlalchemy import Column, String, Float, ForeignKey, Integer, DateTime
+from sqlalchemy import Column, String, Float, ForeignKey, Integer
 from sqlalchemy.orm import relationship, backref
 
-from ozelot.orm import base
 from ozelot import config
+from ozelot.orm import base
 
 
 class Artist(base.Base):

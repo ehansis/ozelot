@@ -79,7 +79,6 @@ def plots_html_page(query_module):
     #
 
     if config.EXTENDED:
-
         gender_df = query_module.gender_query()
 
         pix_size = pixels_to_inches((600, 400))
@@ -104,4 +103,3 @@ def plots_html_page(query_module):
     # done, clean up
     plt.close('all')
     session.close()
-
