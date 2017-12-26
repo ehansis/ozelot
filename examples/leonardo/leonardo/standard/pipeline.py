@@ -1,4 +1,4 @@
-"""Integration pipeline for project 'leonardo', standard version
+"""Data integration pipeline for project 'leonardo', standard version
 """
 
 import datetime
@@ -12,6 +12,7 @@ import models
 
 
 class LoadEverything(tasks.ORMWrapperTask):
+    """Top-level wrapper task"""
 
     def requires(self):
         yield LoadPaintings()
@@ -19,6 +20,7 @@ class LoadEverything(tasks.ORMWrapperTask):
 
 
 class Tests(tasks.ORMWrapperTask):
+    """Wrapper task for running all tests"""
 
     def requires(self):
         yield TestArtists()
@@ -26,6 +28,8 @@ class Tests(tasks.ORMWrapperTask):
 
 
 class ArtistsInputData(tasks.InputFileTask):
+    """Input data file for artists data, with loading method"""
+
     input_file = path.join(config.DATA_DIR, "artists.csv")
 
     def load(self):
@@ -36,12 +40,20 @@ class ArtistsInputData(tasks.InputFileTask):
                          encoding='utf8')
 
         df['wiki_id'] = df['artist'].str.split('/').str[-1]
-        df['year_of_birth'] = df['dob'].str[:4]
+
+        # some years of birth are given as timestamps with prefix 't', convert to string
+        timestamps = df['dob'].str.startswith('t')
+        df.loc[timestamps, 'dob'] = df.loc[timestamps, 'dob'].str[1:].apply(
+            lambda s: str(datetime.datetime.fromtimestamp(float(s))))
+
+        df['year_of_birth'] = df['dob'].str[:4].astype(int)
 
         return df
 
 
 class LoadArtists(tasks.ORMObjectCreatorMixin, tasks.ORMTask):
+    """Load artists to DB"""
+
     object_classes = models.Artist
 
     def requires(self):
@@ -82,6 +94,7 @@ class LoadArtists(tasks.ORMObjectCreatorMixin, tasks.ORMTask):
 
 
 class TestArtists(tasks.ORMTestTask):
+    """Simple consistency checks for artist data"""
 
     def requires(self):
         yield LoadArtists()
@@ -93,13 +106,15 @@ class TestArtists(tasks.ORMTestTask):
         assert df['wiki_id'].is_unique, "Wiki ID is not unique"
 
         if config.EXTENDED:
-            assert df['year_of_birth'].min() > 1200, "Found too small Date of Birth"
+            assert df['year_of_birth'].min() > 0, "Found too small Date of Birth"
             assert df['year_of_birth'].max() < datetime.datetime.now().year, "Found too large Date of Birth"
 
         self.done()
 
 
 class PaintingsInputData(tasks.InputFileTask):
+    """Input data file for paintings, with loading method"""
+
     input_file = path.join(config.DATA_DIR, "paintings.csv")
 
     def load(self):
@@ -118,6 +133,8 @@ class PaintingsInputData(tasks.InputFileTask):
 
 
 class LoadPaintings(tasks.ORMObjectCreatorMixin, tasks.ORMTask):
+    """Load paintings to DB"""
+
     object_classes = models.Painting
 
     def requires(self):
@@ -154,6 +171,7 @@ class LoadPaintings(tasks.ORMObjectCreatorMixin, tasks.ORMTask):
 
 
 class TestPaintings(tasks.ORMTestTask):
+    """Simple consistency checks for paintings"""
 
     def requires(self):
         yield LoadPaintings()

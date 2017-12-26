@@ -26,4 +26,4 @@ DEFAULT_DB_PARAMS = DB_PARAMS
 
 DATA_DIR = path.join(current_directory, 'data')
 
-EXTENDED = False
+EXTENDED = True

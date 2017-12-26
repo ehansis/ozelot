@@ -1,0 +1,9 @@
+name: ozelot-eurominder-2.7
+dependencies:
+  - python=2.7
+  - numpy
+  - pandas
+  - bokeh
+  - pip:
+    - ozelot
+    - jinja2

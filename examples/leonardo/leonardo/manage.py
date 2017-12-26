@@ -10,6 +10,7 @@ import shutil
 import zipfile
 
 from ozelot import config, client
+from leonardo.common import analysis
 
 
 def download_and_unzip(url_, out_path_):
@@ -44,13 +45,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # conditional import, depending on 'mode'
-    models = analysis = pipeline = None
+    models = queries = pipeline = None
     if args.mode:
         if args.mode in ['standard', 'linkeddata', 'kvstore', 'extracols']:
             # this looks a bit hacky ... probably there's a nicer way to do these imports
             pipeline = getattr(__import__('leonardo.' + args.mode + '.pipeline'), args.mode).pipeline
             models = getattr(__import__('leonardo.' + args.mode + '.models'), args.mode).models
-            analysis = getattr(__import__('leonardo.' + args.mode + '.analysis'), args.mode).analysis
+            queries = getattr(__import__('leonardo.' + args.mode + '.queries'), args.mode).queries
         else:
             raise RuntimeError('Invalid parameter for --mode: ' + args.mode)
 
@@ -102,8 +103,7 @@ if __name__ == '__main__':
         else:
             analysis.out_dir = path.dirname(__file__)
 
-        # try to interpret target as function name in 'analysis.py'
-        analysis.all()
+        analysis.plots_html_page(queries)
 
     elif args.command == 'diagrams':
         from ozelot.etl.util import render_diagram
