@@ -1,4 +1,4 @@
-name: ozelot-eurominder-3.5
+name: ozelot-leonardo-3.5
 dependencies:
   - python=3.5
   - numpy
