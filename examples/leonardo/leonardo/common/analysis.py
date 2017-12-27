@@ -1,3 +1,6 @@
+"""Analysis output generation, common for all model/pipeline variants
+"""
+
 from __future__ import absolute_import
 
 from future import standard_library
@@ -45,7 +48,12 @@ def pixels_to_inches(size):
 
 
 def plots_html_page(query_module):
-    """Generate analysis output as html page """
+    """Generate analysis output as html page
+
+    Args:
+        query_module (module): module to use for querying data for the
+            desired model/pipeline variant, e.g. leonardo.standard.queries
+    """
 
     # page template
     template = jenv.get_template("analysis.html")

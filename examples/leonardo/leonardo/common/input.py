@@ -1,3 +1,5 @@
+"""Input file tasks, common for all model/pipeline variants"""
+
 import datetime
 from os import path
 
