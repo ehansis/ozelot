@@ -38,22 +38,18 @@ if __name__ == '__main__':
                                         "\t'diagrams': generate data model and pipeline diagrams\n"
                                         "              NOTE: this requires GraphViz to be installed.")
 
-    parser.add_argument("--mode", help="Model/pipeline variant, one of 'standard', 'inheritance', "
-                                       "'kvstore' or 'extracols'")
     parser.add_argument("--dir", help="For 'analyze' and 'diagrams': output directory (default: current directory)")
 
     args = parser.parse_args()
 
     # conditional import, depending on 'mode'
-    models = queries = pipeline = None
-    if args.mode:
-        if args.mode in ['standard', 'inheritance', 'kvstore', 'extracols']:
-            # this looks a bit hacky ... probably there's a nicer way to do these imports
-            pipeline = getattr(__import__('leonardo.' + args.mode + '.pipeline'), args.mode).pipeline
-            models = getattr(__import__('leonardo.' + args.mode + '.models'), args.mode).models
-            queries = getattr(__import__('leonardo.' + args.mode + '.queries'), args.mode).queries
-        else:
-            raise RuntimeError('Invalid parameter for --mode: ' + args.mode)
+    if config.MODE in ['standard', 'inheritance', 'kvstore', 'extracols']:
+        # this looks a bit hacky ... probably there's a nicer way to do these imports
+        pipeline = getattr(__import__('leonardo.' + config.MODE + '.pipeline'), config.MODE).pipeline
+        models = getattr(__import__('leonardo.' + config.MODE + '.models'), config.MODE).models
+        queries = getattr(__import__('leonardo.' + config.MODE + '.queries'), config.MODE).queries
+    else:
+        raise RuntimeError('Invalid value for MODE: ' + config.MODE)
 
     # do stuff
 
@@ -66,9 +62,6 @@ if __name__ == '__main__':
         print ("done.")
 
     elif args.command == 'initdb':
-
-        if not args.mode:
-            raise RuntimeError('Please supply the parameter --mode to initialize the database')
 
         print("Re-initializing the database ... ", end=' ')
 
@@ -87,16 +80,10 @@ if __name__ == '__main__':
     elif args.command == 'ingest':
         import luigi
 
-        if not args.mode:
-            raise RuntimeError('Please supply the parameter --mode to ingest the data')
-
         print("Running the full ingestion pipeline\n")
         luigi.build([pipeline.LoadEverything()], local_scheduler=True)
 
     elif args.command == 'analyze':
-
-        if not args.mode:
-            raise RuntimeError('Please supply the parameter --mode to produce output')
 
         if args.dir:
             analysis.out_dir = args.dir
@@ -108,18 +95,15 @@ if __name__ == '__main__':
     elif args.command == 'diagrams':
         from ozelot.etl.util import render_diagram
 
-        if not args.mode:
-            raise RuntimeError('Please supply the parameter --mode to draw diagrams')
-
         if args.dir:
             out_dir = args.dir
         else:
             out_dir = path.dirname(__file__)
 
         render_diagram(root_task=pipeline.LoadEverything(),
-                       out_base=path.join(out_dir, 'leonardo_pipeline_' + args.mode))
+                       out_base=path.join(out_dir, 'leonardo_pipeline_' + config.MODE))
 
-        out_base = path.join(out_dir, 'leonardo_schema_' + args.mode)
+        out_base = path.join(out_dir, 'leonardo_schema_' + config.MODE)
         models.base.render_diagram(out_base)
 
     else:

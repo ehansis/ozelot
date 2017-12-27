@@ -6,6 +6,7 @@ Attributes:
     DATA_DIR (str): Directory containing example data
     EXTENDED (bool): Use extended data models (True) or not (False); used to demonstrate
                      model changes and partial re-running of the pipeline
+    MODE (str): Model/pipeline mode, one of 'standard', 'inheritance', 'kvstore' or 'extracols'
 """
 
 from os import path
@@ -27,3 +28,5 @@ DEFAULT_DB_PARAMS = DB_PARAMS
 DATA_DIR = path.join(current_directory, 'data')
 
 EXTENDED = False
+
+MODE = 'inheritance'
