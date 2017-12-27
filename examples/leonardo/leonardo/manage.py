@@ -38,7 +38,7 @@ if __name__ == '__main__':
                                         "\t'diagrams': generate data model and pipeline diagrams\n"
                                         "              NOTE: this requires GraphViz to be installed.")
 
-    parser.add_argument("--mode", help="Model/pipeline variant, one of 'standard', 'linkeddata', "
+    parser.add_argument("--mode", help="Model/pipeline variant, one of 'standard', 'inheritance', "
                                        "'kvstore' or 'extracols'")
     parser.add_argument("--dir", help="For 'analyze' and 'diagrams': output directory (default: current directory)")
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     # conditional import, depending on 'mode'
     models = queries = pipeline = None
     if args.mode:
-        if args.mode in ['standard', 'linkeddata', 'kvstore', 'extracols']:
+        if args.mode in ['standard', 'inheritance', 'kvstore', 'extracols']:
             # this looks a bit hacky ... probably there's a nicer way to do these imports
             pipeline = getattr(__import__('leonardo.' + args.mode + '.pipeline'), args.mode).pipeline
             models = getattr(__import__('leonardo.' + args.mode + '.models'), args.mode).models

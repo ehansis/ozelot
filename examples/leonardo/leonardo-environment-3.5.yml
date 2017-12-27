@@ -1,10 +1,10 @@
-name: ozelot-leonardo-2.7
+name: ozelot-eurominder-3.5
 dependencies:
-  - python=2.7
+  - python=3.5
   - numpy
   - pandas
   - matplotlib
   - pip:
     - ozelot
-    - seaborn
     - jinja2
+    - seaborn

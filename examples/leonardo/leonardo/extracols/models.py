@@ -1,10 +1,9 @@
 """Data models for project 'leonardo', version with 'extra columns'
 """
 
-from sqlalchemy import Column, String, Float, ForeignKey, Integer
+from sqlalchemy import Column, String, ForeignKey, Integer
 from sqlalchemy.orm import relationship, backref
 
-from ozelot import config
 from ozelot.orm import base
 
 

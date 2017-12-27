@@ -2,13 +2,12 @@
 """
 
 import datetime
-from os import path
 
-import pandas as pd
-from ozelot.etl import tasks
 from ozelot import config
+from ozelot.etl import tasks
 
-import models
+from leonardo.common.input import ArtistsInputData, PaintingsInputData
+from . import models
 
 
 class LoadEverything(tasks.ORMWrapperTask):
@@ -27,34 +26,10 @@ class Tests(tasks.ORMWrapperTask):
         yield TestPaintings()
 
 
-class ArtistsInputData(tasks.InputFileTask):
-    """Input data file for artists data, with loading method"""
-
-    input_file = path.join(config.DATA_DIR, "artists.csv")
-
-    def load(self):
-        """Load the data file, do some basic type conversions
-        """
-
-        df = pd.read_csv(self.input_file,
-                         encoding='utf8')
-
-        df['wiki_id'] = df['artist'].str.split('/').str[-1]
-
-        # some years of birth are given as timestamps with prefix 't', convert to string
-        timestamps = df['dob'].str.startswith('t')
-        df.loc[timestamps, 'dob'] = df.loc[timestamps, 'dob'].str[1:].apply(
-            lambda s: str(datetime.datetime.fromtimestamp(float(s))))
-
-        df['year_of_birth'] = df['dob'].str[:4].astype(int)
-
-        return df
-
-
 class LoadArtists(tasks.ORMObjectCreatorMixin, tasks.ORMTask):
     """Load artists to DB"""
 
-    object_classes = models.Artist
+    object_classes = [models.Artist]
 
     def requires(self):
         yield ArtistsInputData()
@@ -116,30 +91,10 @@ class TestArtists(tasks.ORMTestTask):
         self.done()
 
 
-class PaintingsInputData(tasks.InputFileTask):
-    """Input data file for paintings, with loading method"""
-
-    input_file = path.join(config.DATA_DIR, "paintings.csv")
-
-    def load(self):
-        """Load the data file, do some basic type conversions
-        """
-
-        df = pd.read_csv(self.input_file,
-                         encoding='utf8')
-
-        df['wiki_id'] = df['painting'].str.split('/').str[-1]
-        df['creator_wiki_id'] = df['creator'].str.split('/').str[-1]
-        df['decade'] = (df['inception'].str[:4].astype(float) / 10.).astype(int) * 10
-        df['area'] = df['width'] * df['height']
-
-        return df
-
-
 class LoadPaintings(tasks.ORMObjectCreatorMixin, tasks.ORMTask):
     """Load paintings to DB"""
 
-    object_classes = models.Painting
+    object_classes = [models.Painting]
 
     def requires(self):
         yield LoadArtists()
