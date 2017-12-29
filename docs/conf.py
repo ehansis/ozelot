@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 # add directories containing examples to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'examples', 'eurominder'))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'examples', 'superheroes'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'examples', 'leonardo'))
 
 
 # -- General configuration ------------------------------------------------

@@ -58,8 +58,8 @@ Project-level configuration is defined in ``project_config.py``. You can leave a
 values to run the pipeline. A setting you might want to change is the database connection (or location of
 the database file).
 
-The example comes in four different 'modes' of data model and pipeline (see also the
-:ref:`project introduction <leonardo>`. You activate them by setting the ``MODE`` variable in ``project_config.py``
+The example comes in four different **modes** of data model and pipeline.
+You activate them by setting the ``MODE`` variable in ``project_config.py``
 to one of these values:
 
     - 'standard' for the standard mode (surprise...)
@@ -67,7 +67,11 @@ to one of these values:
     - 'inheritance' for the version with model class inheritance
     - 'kvstore' for the key-value-store version
 
-In addition, each o
+In addition, each mode can be run with or without an **extended data model**, by setting the ``EXTENDED`` variable
+to ``True`` or ``False``.
+
+The different modes and the meaning of the extended data model are discussed in detail in the
+:ref:`project introduction <leonardo>`.
 
 
 Input data

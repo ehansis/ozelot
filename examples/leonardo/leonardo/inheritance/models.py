@@ -20,6 +20,9 @@ class Artist(ArtistBase):
     """Artist with attributes
     """
 
+    #: custom table name, required to be able to import models from all modes for API documentation
+    __tablename__ = "artist_inheritance"
+
     #: Foreign-key relationship to associated base object
     id = Column(Integer, ForeignKey(ArtistBase.id), primary_key=True)
 
@@ -49,6 +52,9 @@ class PaintingBase(base.Base):
 class Painting(PaintingBase):
     """Painting with attributes
     """
+
+    #: custom table name, required to be able to import models from all modes for API documentation
+    __tablename__ = "painting_inheritance"
 
     #: Foreign-key relationship to associated base object
     id = Column(Integer, ForeignKey(PaintingBase.id), primary_key=True)

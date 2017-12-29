@@ -12,6 +12,9 @@ class Artist(base.Base):
     """Data representing an artist
     """
 
+    #: custom table name, required to be able to import models from all modes for API documentation
+    __tablename__ = "artist_standard"
+
     #: wikidata id
     wiki_id = Column(String(length=16), index=True, unique=True)
 
@@ -28,6 +31,9 @@ class Artist(base.Base):
 class Painting(base.Base):
     """Data representing a painting
     """
+
+    #: custom table name, required to be able to import models from all modes for API documentation
+    __tablename__ = "painting_standard"
 
     #: wikidata id
     wiki_id = Column(String(length=16), index=True, unique=True)

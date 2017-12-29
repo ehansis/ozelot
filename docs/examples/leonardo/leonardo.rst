@@ -27,14 +27,15 @@ This example demonstrates four data models and how they cope with data model cha
 used so far; a model using 'extra columns'; a model using inheritance; and a
 key-value-store (a.k.a. entity-attribute-value model).
 
-# .. toctree::
-#    :maxdepth: 2
-#
-#    running
-#    inputdata
+.. toctree::
+   :maxdepth: 2
+
+   running
+   inputdata
+   api/leonardo.rst
+
 #    datamodel
 #    pipeline
 #    queries
 #    management
 #    output
-#   api/superheroes.rst
