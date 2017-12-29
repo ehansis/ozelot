@@ -1,0 +1,2 @@
+Put all data files for the project in this folder.
+See the online documentation of the exmample for details.
