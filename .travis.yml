@@ -49,4 +49,42 @@ script:
   - python manage.py initdb
   - python manage.py ingest
   - python manage.py analyze
+  - cd ../leonardo
+  - python manage.py getdata
+  - sed -i -e 's/MODE.*/MODE = "standard"/' project_config.py
+  - sed -i -e 's/EXTENDED.*/EXTENDED = False/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/EXTENDED.*/EXTENDED = True/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/MODE.*/MODE = "inheritance"/' project_config.py
+  - sed -i -e 's/EXTENDED.*/EXTENDED = False/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/EXTENDED.*/EXTENDED = True/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/MODE.*/MODE = "kvstore"/' project_config.py
+  - sed -i -e 's/EXTENDED.*/EXTENDED = False/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/EXTENDED.*/EXTENDED = True/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/MODE.*/MODE = "extracols"/' project_config.py
+  - sed -i -e 's/EXTENDED.*/EXTENDED = False/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
+  - sed -i -e 's/EXTENDED.*/EXTENDED = True/' project_config.py
+  - python manage.py initdb
+  - python manage.py ingest
+  - python manage.py analyze
 
