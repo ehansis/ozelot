@@ -3,6 +3,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
+import sys
 from os import path
 import argparse
 import requests
@@ -56,7 +57,7 @@ if __name__ == '__main__':
     print ("Running in mode '{}'".format(config.MODE))
 
     if args.command == 'getdata':
-        url = "https://github.com/trycs/ozelot-example-data/raw/master/leonardo/leonardo_data.zip"
+        url = "https://github.com/trycs/ozelot-example-data/raw/master/leonardo/data.zip"
         out_path = path.join(config.DATA_DIR, "data.zip")
 
         print ("Downloading and unpacking " + url + " ...")
@@ -84,6 +85,10 @@ if __name__ == '__main__':
 
         print("Running the full ingestion pipeline\n")
         luigi.build([pipeline.LoadEverything()], local_scheduler=True)
+
+        # exit with error if pipeline didn't finish successfully
+        if not pipeline.LoadEverything().complete():
+            sys.exit("Pipeline didn't complete successfully.")
 
     elif args.command == 'analyze':
 

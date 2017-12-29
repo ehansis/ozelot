@@ -75,7 +75,7 @@ Input data
 
 To get the input data required to run the example, run ``python manage.py getdata``.
 This downloads the data
-`from the 'ozelot-example-data' repository <https://github.com/trycs/ozelot-example-data/raw/master/leonardo/leonardo_data.zip>`_
+`from the 'ozelot-example-data' repository <https://github.com/trycs/ozelot-example-data/raw/master/leonardo/data.zip>`_
 and unzips it to the folder ``examples/leonardo/data``.
 
 
