@@ -53,6 +53,8 @@ if __name__ == '__main__':
 
     # do stuff
 
+    print ("Running in mode '{}'".format(config.MODE))
+
     if args.command == 'getdata':
         url = "https://github.com/trycs/ozelot-example-data/raw/master/leonardo/leonardo_data.zip"
         out_path = path.join(config.DATA_DIR, "data.zip")
