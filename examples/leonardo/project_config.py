@@ -4,9 +4,9 @@ Attributes:
     DB_PARAMS (dict): Database connection parameters
     DEFAULT_DB_PARAMS (str): Key of database connection to use by default
     DATA_DIR (str): Directory containing example data
-    EXTENDED (bool): Use extended data models (True) or not (False); used to demonstrate
+    EXTENDED = True
                      model changes and partial re-running of the pipeline
-    MODE (str): Model/pipeline mode, one of 'standard', 'inheritance', 'kvstore' or 'extracols'
+    MODE = "kvstore"
 """
 
 from os import path
@@ -29,4 +29,4 @@ DATA_DIR = path.join(current_directory, 'data')
 
 EXTENDED = False
 
-MODE = 'inheritance'
+MODE = "standard"
