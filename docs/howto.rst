@@ -41,6 +41,7 @@ Running the pipeline
 --------------------
 
     - :ref:`Running specific tasks <ht-running-tasks>`
+    - :ref:`Checking and acting on pipeline run failures <ht-pipeline-exit-status>`
     - :ref:`ht-checking-completion`
     - :ref:`ht-clearing-tasks`
     - :ref:`Drawing a pipeline diagram <ht-pipeline-diagram-simple>`
