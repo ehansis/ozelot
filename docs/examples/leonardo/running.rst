@@ -29,7 +29,7 @@ the ``examples/leonardo`` directory. Install them by running
 
 If you are using a virtual environment, make sure to activate it before installing.
 
-Note that the example requires :mod:`matplotlib` and :mod:`scipy`, so a pure ``pip`` installation
+Note that the example requires :mod:`matplotlib` and :mod:`numpy`/:mod:`pandas` so a pure ``pip`` installation
 may not be possible (or cause severe headaches). See the :mod:`ozelot`
 :ref:`installation instructions <ozelot-package-installation>` for how to install these
 using conda.
