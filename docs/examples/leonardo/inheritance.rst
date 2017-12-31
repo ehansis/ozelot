@@ -1,0 +1,4 @@
+.. _le-inheritance:
+
+Inheritance
+***********

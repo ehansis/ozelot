@@ -10,28 +10,17 @@ This is not always desirable, however. For example, your pipeline may include so
 that you don't wish to re-run.
 Or you might want to save time during development by re-running parts of the pipeline only.
 
-- RDBMS and migrations
-- Tasks and foreign key constraints
-- Document-oriented DBs
-
-For each model:
-
-- model structure
-- storing
-- querying
-- introducing the model change
-- one-off data loading
-- re-running a part of the pipeline
-
-This example demonstrates four data models and how they cope with data model changes: the 'standard' model
-used so far; a model using 'extra columns'; a model using inheritance; and a
-key-value-store (a.k.a. entity-attribute-value model).
 
 .. toctree::
    :maxdepth: 2
 
    running
    inputdata
+   modes
+   standard
+   extracols
+   inheritance
+   kvstore
    api/leonardo.rst
 
 #    datamodel

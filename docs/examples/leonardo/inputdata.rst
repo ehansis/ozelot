@@ -24,8 +24,8 @@ Portrait paintings and their artists
 In this example we will use some data about paintings and their artists.
 In particular, we will limit the analysis to portrait paintings.
 It is not required that you understand every aspect about the queries below, they are given here mainly
-for completeness. The resulting data, after executing the queries in the :ref:`Wikidata Query Service`,
-can be downloaded
+for completeness. The resulting data, after executing the queries in the
+`Wikidata Query Service <https://query.wikidata.org/>`_, can be downloaded
 `from the 'ozelot-example-data' repository <https://github.com/trycs/ozelot-example-data/raw/master/leonardo/data.zip>`_.
 
 The first query retrieves data about the paintings.
@@ -35,6 +35,7 @@ in normalized units, and the date of inception (P571).
 Since there may be many dates of inception (e.g. an earliest and latest estimated date),
 a grouped query is executed and the minimum date selected. For the other fields,
 a random sample is selected (from the, usually, single available value).
+When writing this example, this returned data for 4500 paintings.
 
 .. code-block:: none
 
@@ -59,6 +60,7 @@ For portrait paintings selected as above, it retrieves the artist/creator (P170)
 For the artist it exports the gender (P21) with an English label and
 the date of birth (P569). Again, as there may be several dates of birth given,
 a grouped query is used.
+This returned data for 3159 artists, at the time of writing the example.
 
 .. code-block:: none
 

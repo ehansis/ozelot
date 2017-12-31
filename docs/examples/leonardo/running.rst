@@ -51,6 +51,8 @@ This will set up a new conda environment called ``ozelot-leonardo-2.7`` includin
 For a Python 3.5 environment, use the file ``leonardo-environment-3.5.yml`` from the example's folder.
 
 
+.. _le-configuration:
+
 Configuration
 -------------
 
