@@ -1,0 +1,4 @@
+matplotlib
+jinja2
+seaborn
+ozelot>=0.2.2
