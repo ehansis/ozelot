@@ -90,6 +90,8 @@ The second query similarly filters the paintings and retrieves area and artist g
     :pyobject: gender_query
 
 
+.. _le-standard-change:
+
 Changing the model
 ==================
 

@@ -399,3 +399,8 @@ with possibly devastating consequences for your data integrity.)
 In this case, you would have to (recursively) drop all tables that keep foreign key references before dropping your
 target table, and re-create them in reverse order.
 
+This approach, and related difficulties, are also explored in the
+:ref:`'leonardo' example <le-standard-change>`.
+
+
+

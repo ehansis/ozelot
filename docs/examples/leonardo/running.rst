@@ -67,7 +67,7 @@ to one of these values:
     - 'standard' for the standard mode (surprise...)
     - 'extracols' for the version with extra columns
     - 'inheritance' for the version with model class inheritance
-    - 'kvstore' for the key-value-store version
+    - 'kvstore' for the entity-attribute value (a.k.a. key-value-store) version
 
 In addition, each mode can be run with or without an **extended data model**, by setting the ``EXTENDED`` variable
 to ``True`` or ``False``.
@@ -92,16 +92,16 @@ The example comes with a small script :file:`manage.py` that can be used to init
 
     - Run ``python manage.py getdata`` to download and unpack the pipeline input data (see above).
 
-    - Run ``python manage.py initdb`` to (re-)initialize the database and create all tables for the :ref:`em-datamodel`.
-      You need to run this once before launching the ETL pipeline.
+    - Run ``python manage.py initdb`` to (re-)initialize the database and create all tables for the
+      chosen :ref:`data model version <le-modes>`.
 
       When using an SQLite database, the database file is created in case it does not exist yet.
       For other database backends (e.g. postgresql), the used database has to exist already.
 
       .. warning:: ``initdb`` deletes all present data in the database.
 
-    - Calling ``python manage.py ingest`` runs the full :ref:`em-pipeline`. After successful completion,
-      all ingested data is present in the database.
+    - Calling ``python manage.py ingest`` runs the full ingestion pipeline for the chosen mode.
+      After successful completion, all ingested data is present in the database.
 
     - Run ``python manage.py analyze`` to generate the analysis output and write it
       to the current directory, or to a custom directory defined by appending ``--dir <output_path>``.

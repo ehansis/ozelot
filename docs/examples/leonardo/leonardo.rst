@@ -10,21 +10,20 @@ This is not always desirable, however. For example, your pipeline may include so
 that you don't wish to re-run.
 Or you might want to save time during development by re-running parts of the pipeline only.
 
+In this example, we explore different ways of implementing the same data integration pipeline with
+different data models. In particular, we look at how changes to the data model are handled by each version.
+Continue reading :ref:`le-modes` to learn more.
+
 
 .. toctree::
    :maxdepth: 2
 
+   modes
    running
    inputdata
-   modes
    standard
    extracols
    inheritance
    kvstore
    api/leonardo.rst
 
-#    datamodel
-#    pipeline
-#    queries
-#    management
-#    output

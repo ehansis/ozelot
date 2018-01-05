@@ -9,6 +9,9 @@ Setup
 This model/pipeline version uses class inheritance. To try it out, set ``MODE = 'inheritance'`` and
 ``EXTENDED = False`` in ``project_config.py``.
 
+
+.. _le-model-inheritance:
+
 Data model
 ----------
 
@@ -55,6 +58,7 @@ For more details, please refer to the
 :mod:`sqlalchemy` `documentation <http://docs.sqlalchemy.org/en/latest/orm/inheritance.html>`_.
 
 
+.. _le-inheritance-pipeline:
 
 Pipeline
 --------
@@ -74,6 +78,8 @@ corresponding base and derived instances carry the same :attr:`id`.
 
 .. literalinclude:: ../../../examples/leonardo/leonardo/inheritance/pipeline.py
     :pyobject: LoadArtists
+
+A corresponding approach is used in :class:`LoadPaintingsBase` and :class:`LoadPaintings`.
 
 As mentioned above, if we created :class:`Artist` as regular object instances and stored them via
 ``session.add(...)``, :mod:`sqlalchemy` would take care of creating a base class instance.
