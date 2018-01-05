@@ -121,4 +121,6 @@ examples/superheroes/superheroes_web_cache.db.zip
 
 # PyCharm project conf
 .idea
-put_data_here.txt
+examples/leonardo/leonardo.db
+examples/leonardo/data/artists.csv
+examples/leonardo/data/paintings.csv

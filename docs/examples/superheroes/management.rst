@@ -197,6 +197,17 @@ the completion marker on :class:`LoadEverything` and exits:
 
 
 
+.. _ht-pipeline-exit-status:
+
+.. note:: Luigi catches any exceptions that occur in the pipeline run. This enables the pipeline continue to run
+          (as far as possible) even if some of the tasks fail. However, this also means that the
+          ``luigi.build`` command never raises an exception. The script will return an exit code of '0'
+          (meaning 'no error') even if the pipeline run failed. This is inconvenient if the pipeline is included
+          in a larger workflow, such as a continuous integration system, that checks error codes to determine
+          success. In this case, you have to explicitly check the pipeline completion with something like
+          ``if not pipeline.LoadEverything().complete(): sys.exit("Pipeline failed)``.
+
+
 .. _ht-checking-completion:
 
 Checking task completion
@@ -340,7 +351,9 @@ If you need to migrate regularly, consider using a tool like `alembic <http://al
 
 For many small- to medium-sized projects, the 'nuclear' option is a safe bet: re-initalize the database
 and rebuild the whole pipeline using your new data model.
-If you find this as being tedious for small changes, here are some other options.
+If you find this as being tedious for small changes, some alternative options are described below.
+
+Data model changes and 'flexible' data models are explored in detail in the :ref:`'leonardo' example <leonardo>`.
 
 .. _ht-add-object-class:
 
@@ -385,4 +398,9 @@ most databases enforce foreign key constraints! (SQLite does not, here you can d
 with possibly devastating consequences for your data integrity.)
 In this case, you would have to (recursively) drop all tables that keep foreign key references before dropping your
 target table, and re-create them in reverse order.
+
+This approach, and related difficulties, are also explored in the
+:ref:`'leonardo' example <le-standard-change>`.
+
+
 

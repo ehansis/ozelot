@@ -3,6 +3,7 @@
 from __future__ import print_function
 from __future__ import absolute_import
 
+import sys
 from os import path
 import argparse
 import requests
@@ -10,15 +11,15 @@ import shutil
 import zipfile
 
 
-def download_and_unzip(url, out_path):
-    r = requests.get(url, stream=True)
+def download_and_unzip(url_, out_path_):
+    r = requests.get(url_, stream=True)
     if r.status_code == 200:
-        with open(out_path, 'wb') as f:
+        with open(out_path_, 'wb') as f:
             r.raw.decode_content = True
             shutil.copyfileobj(r.raw, f)
 
-    zip_arch = zipfile.ZipFile(out_path, 'r')
-    zip_arch.extractall(path.dirname(out_path))
+    zip_arch = zipfile.ZipFile(out_path_, 'r')
+    zip_arch.extractall(path.dirname(out_path_))
     zip_arch.close()
 
 
@@ -63,6 +64,10 @@ if __name__ == '__main__':
 
         print("Running the full ingestion pipeline\n")
         luigi.build([pipeline.LoadEverything()], local_scheduler=True)
+
+        # exit with error if pipeline didn't finish successfully
+        if not pipeline.LoadEverything().complete():
+            sys.exit("Pipeline didn't complete successfully.")
 
     elif args.command == 'analyze':
         from superheroes import analysis

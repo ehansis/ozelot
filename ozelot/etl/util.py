@@ -6,7 +6,7 @@ Utility functions for ETL pipelines
 """
 
 
-def render_diagram(root_task, out_base, max_param_len=20, horizontal=False):
+def render_diagram(root_task, out_base, max_param_len=20, horizontal=False, colored=False):
     """Render a diagram of the ETL pipeline
 
     All upstream tasks (i.e. requirements) of :attr:`root_task` are rendered.
@@ -22,6 +22,7 @@ def render_diagram(root_task, out_base, max_param_len=20, horizontal=False):
         out_base (str): base output file name (file endings will be appended)
         max_param_len (int): Maximum shown length of task parameter values
         horizontal (bool): If True, layout graph left-to-right instead of top-to-bottom
+        colored (bool): If True, show task completion status by color of nodes
     """
     import re
     import codecs
@@ -73,11 +74,19 @@ def render_diagram(root_task, out_base, max_param_len=20, horizontal=False):
                     "</TD></TR>" \
                     "".format(get_task_name(task)) + param_list + "</TABLE>"
 
+            style = getattr(task, 'diagram_style', [])
+
+            if colored:
+                color = ', color="{:s}"'.format("green" if task.complete() else "red")
+            else:
+                color = ''
+
             # add a node for the task
-            lines.append(u"{name:s} [label=< {label:s} >, shape=\"rect\", style=\"{style:s}\"];\n"
+            lines.append(u"{name:s} [label=< {label:s} >, shape=\"rect\" {color:s}, style=\"{style:s}\"];\n"
                          u"".format(name=tid,
                                     label=label,
-                                    style=','.join(getattr(task, 'diagram_style', []))))
+                                    color=color,
+                                    style=','.join(style)))
 
             existing_nodes.add(tid)
 

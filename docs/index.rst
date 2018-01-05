@@ -16,6 +16,7 @@ Ozelot Documentation
    :caption: Contents:
 
    introduction
+   changelog
    setup
    examples
    howto

@@ -1,0 +1,10 @@
+name: ozelot-leonardo-3.5
+dependencies:
+  - python=3.5
+  - numpy
+  - pandas
+  - matplotlib
+  - pip:
+    - ozelot
+    - jinja2
+    - seaborn

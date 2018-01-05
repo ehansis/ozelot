@@ -112,3 +112,9 @@ the example documentation:
     cd docs/examples/eurominder
     sphinx-apidoc -f -o api ../../../examples/eurominder/eurominder
 
+
+.. code-block:: none
+
+    cd docs/examples/leonardo
+    sphinx-apidoc -f -o api ../../../examples/leonardo/leonardo
+
