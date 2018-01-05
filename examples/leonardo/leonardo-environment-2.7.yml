@@ -1,16 +1,10 @@
-name: ozelot-superheroes-2.7
+name: ozelot-leonardo-2.7
 dependencies:
   - python=2.7
   - numpy
   - pandas
-  - lxml>=2.9.4
   - matplotlib
-  - graphviz
   - pip:
     - ozelot
-    - argparse
-    - requests
-    - xlrd
     - seaborn
     - jinja2
-    - openpyxl

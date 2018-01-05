@@ -351,7 +351,9 @@ If you need to migrate regularly, consider using a tool like `alembic <http://al
 
 For many small- to medium-sized projects, the 'nuclear' option is a safe bet: re-initalize the database
 and rebuild the whole pipeline using your new data model.
-If you find this as being tedious for small changes, here are some other options.
+If you find this as being tedious for small changes, some alternative options are described below.
+
+Data model changes and 'flexible' data models are explored in detail in the :ref:`'leonardo' example <leonardo>`.
 
 .. _ht-add-object-class:
 
@@ -396,4 +398,9 @@ most databases enforce foreign key constraints! (SQLite does not, here you can d
 with possibly devastating consequences for your data integrity.)
 In this case, you would have to (recursively) drop all tables that keep foreign key references before dropping your
 target table, and re-create them in reverse order.
+
+This approach, and related difficulties, are also explored in the
+:ref:`'leonardo' example <le-standard-change>`.
+
+
 

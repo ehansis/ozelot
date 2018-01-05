@@ -17,6 +17,7 @@ ORM data model
     - :ref:`Cascading deletes across relationships <ht-cascading>`
     - :ref:`Initializing a database with the ORM schame <ht-initializing-db>`
     - :ref:`Drawing a data model diagram <ht-model-diagram>`
+    - :ref:`Using class inheritance for extensible data models <le-model-inheritance>`
 
 ETL pipeline
 ============
@@ -36,6 +37,7 @@ Defining the pipeline
     - :ref:`ht-subclassing-tasks`
     - :ref:`ht-task-parameters`
     - :ref:`Using the client and session properties of ORMTask <ht-task-session>`
+    - :ref:`Separating entity creation and attribute loading <le-inheritance-pipeline>`
 
 Running the pipeline
 --------------------
@@ -59,6 +61,7 @@ ORM data management
     - :ref:`ht-write-sql`
     - :ref:`ht-bulk-save`
     - :ref:`Issues with bulk saving and auto-incrementing primary keys <ht-sequences-and-bulk>`
+    - :ref:`Entity-attribute-value (or key-value-store) model <le-kvstore>`
 
 
 Queries
@@ -76,9 +79,10 @@ Queries
     - :ref:`Querying to a pandas DataFrane <ht-query-dataframe>`
     - :ref:`ht-delete-cascade`
 
-Web scraping
+Data sources
 ============
 
     - :ref:`Requesting web pages (via the request cache) <ht-requesting-pages>`
     - :ref:`HTML parsing using lxml <ht-lxml-html-parsing>`
+
 

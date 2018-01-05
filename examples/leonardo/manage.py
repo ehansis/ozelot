@@ -1,14 +1,17 @@
-"""Management script for project 'eurominder'
+"""Management script for project 'leonardo'
 """
 from __future__ import print_function
 from __future__ import absolute_import
 
 import sys
-from os import path, mkdir
+from os import path, remove
 import argparse
 import requests
 import shutil
 import zipfile
+
+from ozelot import config, client
+from leonardo.common import analysis
 
 
 def download_and_unzip(url_, out_path_):
@@ -36,35 +39,58 @@ if __name__ == '__main__':
                                         "\t'diagrams': generate data model and pipeline diagrams\n"
                                         "              NOTE: this requires GraphViz to be installed.")
 
-    parser.add_argument("--target", help="For 'analyze': analysis to create, 'all' to create all (default)")
-    parser.add_argument("--dir", help="For 'analyze' and 'diagrams': output directory")
+    parser.add_argument("--dir", help="For 'analyze' and 'diagrams': output directory (default: current directory)")
 
     args = parser.parse_args()
 
+    # conditional import, depending on 'mode'
+    if config.MODE in ['standard', 'inheritance', 'kvstore', 'extracols']:
+        # this looks a bit hacky ... probably there's a nicer way to do these imports
+        pipeline = getattr(__import__('leonardo.' + config.MODE + '.pipeline'), config.MODE).pipeline
+        models = getattr(__import__('leonardo.' + config.MODE + '.models'), config.MODE).models
+        queries = getattr(__import__('leonardo.' + config.MODE + '.queries'), config.MODE).queries
+    else:
+        raise RuntimeError('Invalid value for MODE: ' + config.MODE)
+
     # do stuff
 
-    if args.command == 'getdata':
-        data_dir = path.join(path.dirname(__file__), "eurominder", "data")
-        if not path.exists(data_dir):
-            mkdir(data_dir)
+    print ("Running in mode '{}'".format(config.MODE))
 
-        url = "https://github.com/trycs/ozelot-example-data/raw/master/eurominder/data.zip"
-        out_path = path.join(data_dir, "data.zip")
+    if args.command == 'getdata':
+        url = "https://github.com/trycs/ozelot-example-data/raw/master/leonardo/data.zip"
+        out_path = path.join(config.DATA_DIR, "data.zip")
 
         print ("Downloading and unpacking " + url + " ...")
         download_and_unzip(url, out_path)
         print ("done.")
 
     elif args.command == 'initdb':
-        from eurominder import models
 
         print("Re-initializing the database ... ", end=' ')
-        models.reinitialize()
+
+        from ozelot.orm import base
+
+        # import all additional models needed in this project
+        # noinspection PyUnresolvedReferences
+        from ozelot.orm.target import ORMTargetMarker
+
+        client = client.get_client()
+
+        # delete database file instead of dropping the tables only; the latter fails
+        # when switching between different schemas
+        db_file = config.DB_PARAMS['database']
+        if path.exists(db_file) and config.DB_PARAMS['driver'] == 'sqlite':
+            print ("Removing " + db_file + " before re-initializing the DB ... ", end=' ')
+            remove(db_file)
+        else:
+            base.Base.drop_all(client)
+
+        base.Base.create_all(client)
+
         print("done.")
 
     elif args.command == 'ingest':
         import luigi
-        from eurominder import pipeline
 
         print("Running the full ingestion pipeline\n")
         luigi.build([pipeline.LoadEverything()], local_scheduler=True)
@@ -74,26 +100,15 @@ if __name__ == '__main__':
             sys.exit("Pipeline didn't complete successfully.")
 
     elif args.command == 'analyze':
-        from eurominder import analysis
-
-        if args.target:
-            target = args.target
-        else:
-            target = 'all'
 
         if args.dir:
             analysis.out_dir = args.dir
-
-        # try to interpret target as function name in 'analysis.py'
-        func = getattr(analysis, target, None)
-        if func is None:
-            print("Unknown analysis target: " + target)
         else:
-            func()
+            analysis.out_dir = path.dirname(__file__)
+
+        analysis.plots_html_page(queries)
 
     elif args.command == 'diagrams':
-        from eurominder import models
-        from eurominder import pipeline
         from ozelot.etl.util import render_diagram
 
         if args.dir:
@@ -102,10 +117,9 @@ if __name__ == '__main__':
             out_dir = path.dirname(__file__)
 
         render_diagram(root_task=pipeline.LoadEverything(),
-                       out_base=path.join(out_dir, 'eurominder_pipeline'),
-                       horizontal=True)
+                       out_base=path.join(out_dir, 'leonardo_pipeline_' + config.MODE))
 
-        out_base = path.join(out_dir, 'eurominder_schema')
+        out_base = path.join(out_dir, 'leonardo_schema_' + config.MODE)
         models.base.render_diagram(out_base)
 
     else:

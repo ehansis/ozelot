@@ -4,7 +4,6 @@ requests
 ozelot>=0.1
 xlrd
 matplotlib
-scipy
 seaborn
 jinja2
 openpyxl

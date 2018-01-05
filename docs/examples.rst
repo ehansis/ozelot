@@ -16,5 +16,6 @@ The examples below are listed in order of their complexity, from basic to advanc
 
    examples/superheroes/superheroes
    examples/eurominder/eurominder
+   examples/leonardo/leonardo
 
 

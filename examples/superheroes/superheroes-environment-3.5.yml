@@ -4,7 +4,6 @@ dependencies:
   - numpy
   - pandas
   - lxml>=2.9.4
-  - scipy
   - matplotlib
   - graphviz
   - pip:
