@@ -78,3 +78,11 @@ This returned data for 3159 artists, at the time of writing the example.
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
     }
     GROUP BY ?artist ?artistLabel
+
+
+Representation in the pipeline
+------------------------------
+
+The input tables, including loading functions,
+are contained in :mod:`leonardo.common.input.ArtistsInputData` and :mod:`leonardo.common.input.PaintingsInputData`.
+These are common to all model/pipeline versions, the rest of the pipeline is implemented separately for each version.
