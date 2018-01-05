@@ -15,6 +15,7 @@ class LoadEverything(tasks.ORMWrapperTask):
 
     def requires(self):
         yield LoadPaintings()
+        yield LoadArtists()
         yield Tests()
 
 

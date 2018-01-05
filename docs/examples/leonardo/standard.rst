@@ -3,14 +3,15 @@
 Standard version
 ****************
 
-.. _le-standard-model:
-
 
 Setup
 =====
 
 The first model/pipeline version is the 'standard' version. To start out, set ``MODE = 'standard'`` and
 ``EXTENDED = False`` in ``project_config.py``.
+
+
+.. _le-standard-model:
 
 Data model
 ----------
@@ -58,6 +59,8 @@ artists objects via their wiki ID and storing the respective object IDs in :attr
 On the ingested data, consistency checks are run in :class:`TestArtists` and :class:`TestPaintings`.
 Additionally, there are two wrapper tasks :class:`Tests` and :class:`LoadEverything` for management purposes.
 
+
+.. _le-standard-queries:
 
 Queries and Analysis
 --------------------
