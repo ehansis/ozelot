@@ -37,6 +37,8 @@ this is going to cause headaches when working with data model changes.
     :pyobject: Painting
 
 
+.. _le-standard-pipeline:
+
 Pipeline
 --------
 

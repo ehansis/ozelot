@@ -22,7 +22,7 @@ Both :class:`Artist` and :class:`Painting` are derived from a base class,
 The base class only stores the :attr:`wiki_id` and, in the case of :class:`PaintingBase`, the foreign-key reference
 to the respective :class:`ArtistBase`.
 
-Such a data model lets us separate some object attributes from object entities.
+Such a data model lets us separate object attributes from base entities.
 This helps when changing the model, as demonstrated :ref:`below <le-inheritance-change>`.
 In the present example, this may look like overhead (and for such a simple setup it probably is).
 However, inheritance can be a useful way of managing data models in multi-tenant solutions or similar situations:
@@ -32,7 +32,7 @@ to implement and maintain the overlap five times.
 Using a custom base class with extended inherited classes for each customer can be a viable solution in this case.
 
 In code, this model is implemented by regular class inheritance.
-Note the custom :attr:`id` column linking to the base instance:
+Note the custom :attr:`id` column in :class:`Artist` linking to the base instance:
 
 .. literalinclude:: ../../../examples/leonardo/leonardo/inheritance/models.py
     :pyobject: ArtistBase
@@ -40,12 +40,16 @@ Note the custom :attr:`id` column linking to the base instance:
 .. literalinclude:: ../../../examples/leonardo/leonardo/inheritance/models.py
     :pyobject: Artist
 
-When using inheritance, :mod:`sqlalchemy` offers a lot of help in using such a data model:
-If you query a derived object, :mod:`sqlalchemy` automatically joins in the respective base class table.
-Also, when creating and committing object instances via ``session.add(...)``, adding a derived instance
+:mod:`sqlalchemy` has very useful functionality for such a data model.
+Attributes of the base class are available in the derived classes, both in Python and for queries.
+By default, :mod:`sqlalchemy` uses 'joined table inheritance': base and derived classes
+map to separate tables that are joined automatically in queries. This means that,
+if you query a derived object, :mod:`sqlalchemy` automatically joins in the respective base class table.
+Corresponding object instances of the base and derived class carry the same :attr:`id`.
+When creating and committing object instances via ``session.add(...)``, adding a derived instance
 automatically also adds a base instance, with matching keys.
 
-Inheritance is often used with a 'polymorphic discriminator column' - a column in the base class which is automatically
+Inheritance is often used with a 'polymorphic discriminator column' - a column in the base class that is automatically
 filled with a value describing which derived class the entity belongs to.
 For more details, please refer to the
 :mod:`sqlalchemy` `documentation <http://docs.sqlalchemy.org/en/latest/orm/inheritance.html>`_.

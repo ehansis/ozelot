@@ -41,7 +41,8 @@ class Entity(base.Base):
         # don't store NaN values
         df = df.dropna(how='any')
 
-        # pivot attribute names to columns, drop column names to one level ('unstack' generated multi-level names)
+        # pivot attribute names to columns, drop column names to one level
+        # ('unstack' generated multi-level names)
         df = df.set_index(['id', 'name']).unstack().reset_index()
         # noinspection PyUnresolvedReferences
         df.columns = ['id'] + list(df.columns.get_level_values(1)[1:])

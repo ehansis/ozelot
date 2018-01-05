@@ -29,4 +29,4 @@ DATA_DIR = path.join(current_directory, 'data')
 
 EXTENDED = False
 
-MODE = "standard"
+MODE = "kvstore"
