@@ -81,6 +81,7 @@ if __name__ == '__main__':
         db_file = config.DB_PARAMS['database']
         if path.exists(db_file) and config.DB_PARAMS['driver'] == 'sqlite':
             print ("Removing " + db_file + " before re-initializing the DB ... ", end=' ')
+            remove(db_file)
         else:
             base.Base.drop_all(client)
 
