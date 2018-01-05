@@ -9,6 +9,9 @@ Standard version
 Setup
 =====
 
+The first model/pipeline version is the 'standard' version. To start out, set ``MODE = 'standard'`` and
+``EXTENDED = False`` in ``project_config.py``.
+
 Data model
 ----------
 
@@ -36,14 +39,14 @@ this is going to cause headaches when working with data model changes.
 Pipeline
 --------
 
-.. py:currentmodule:: leonardo.standard.models
+.. py:currentmodule:: leonardo.standard.pipeline
 
 .. image:: ../../_static/leonardo/leonardo_pipeline_standard.png
 
 The ingestion pipeline is pretty straightforward: First, artists are stored in the DB via
 :class:`LoadArtists`, then paintings in :class:`LoadPaintings`.
-These tasks mainly load the input tables from :class:`leonardo.common.ArtistsInputData` and
-:class:`leonardo.common.PaintingsInputData`,
+These tasks mainly load the input tables from :class:`leonardo.common.input.ArtistsInputData` and
+:class:`leonardo.common.input.PaintingsInputData`,
 re-format them suitably and store them directly as SQL tables.
 
 In :func:`LoadPaintings.run`, note how paintings are linked to artists by looking up the respective
@@ -154,6 +157,12 @@ and issue two commands to append the desired columns:
 
 There are also ways to do this in :mod:`sqlalchemy`, if you want to use Python or if
 you want to stay independent of the database backend.
+
+
+.. _le-standard-loading:
+
+Manual data loading
+-------------------
 
 Now that you have the desired fields in the database, you need to ingest the additional data.
 Simply running ``python manage.py ingest`` does nothing, because the tasks are all marked as complete:
