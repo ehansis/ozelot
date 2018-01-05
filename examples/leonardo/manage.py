@@ -4,7 +4,7 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import sys
-from os import path
+from os import path, remove
 import argparse
 import requests
 import shutil
@@ -75,7 +75,15 @@ if __name__ == '__main__':
         from ozelot.orm.target import ORMTargetMarker
 
         client = client.get_client()
-        base.Base.drop_all(client)
+
+        # delete database file instead of dropping the tables only; the latter fails
+        # when switching between different schemas
+        db_file = config.DB_PARAMS['database']
+        if path.exists(db_file) and config.DB_PARAMS['driver'] == 'sqlite':
+            print ("Removing " + db_file + " before re-initializing the DB ... ", end=' ')
+        else:
+            base.Base.drop_all(client)
+
         base.Base.create_all(client)
 
         print("done.")
