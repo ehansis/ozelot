@@ -145,15 +145,8 @@ class TestStringSanitizing(unittest.TestCase):
         self.assertEquals(s, u"too much whitespace!")
 
     def test02b(self):
-        """Don't strip whitespace (but remove non-printable chars)"""
-        s = util.sanitize(u"\t\t too \n   much  \r\n  whitespace!   ",
-                          normalize_whitespace=False)
-        self.assertEquals(s, u" too    much    whitespace!   ")
-
-    def test02c(self):
-        """Don't strip whitespace (and do not remove non-printable chars)"""
-        s = util.sanitize(u"\t\t too \n   much  \r\n  whitespace!   ",
-                          normalize_whitespace=False, strip_non_printable=False)
+        """Don't strip whitespace"""
+        s = util.sanitize(u"\t\t too \n   much  \r\n  whitespace!   ", normalize_whitespace=False)
         self.assertEquals(s, u"\t\t too \n   much  \r\n  whitespace!   ")
 
     def test03a(self):
@@ -186,13 +179,3 @@ class TestStringSanitizing(unittest.TestCase):
         """Don't normalize encoding"""
         s = util.sanitize(u"Hör auf!", encoding='ascii', enforce_encoding=False)
         self.assertEquals(s, u"Hör auf!")
-
-    def test05a(self):
-        """Strip non-printable characters"""
-        s = util.sanitize(u"Bell:\u0007")
-        self.assertEquals(s, u"Bell:")
-
-    def test05b(self):
-        """Don't strip non-printable characters"""
-        s = util.sanitize(u"Bell:\u0007", strip_non_printable=False)
-        self.assertEquals(s, u"Bell:\u0007")
