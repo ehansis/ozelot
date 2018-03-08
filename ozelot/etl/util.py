@@ -1,9 +1,16 @@
+from builtins import str
 import os
+import re
+import unicodedata
 
 
 """
 Utility functions for ETL pipelines
 """
+
+# along the lines of https://stackoverflow.com/a/93029/5839193
+control_chars = ''.join(map(unichr, range(0, 32) + range(127, 160)))
+control_char_re = re.compile(ur'[{:s}]'.format(re.escape(control_chars)))
 
 
 def render_diagram(root_task, out_base, max_param_len=20, horizontal=False, colored=False):
@@ -122,3 +129,42 @@ def render_diagram(root_task, out_base, max_param_len=20, horizontal=False, colo
         '-o', out_base + '.png',
               out_base + '.dot'
     ])
+
+
+def sanitize(s,
+             normalize_whitespace=True,
+             normalize_unicode=True,
+             form='NFKC',
+             enforce_encoding=True,
+             encoding='utf-8',
+             strip_non_printable=True):
+    """Normalize a string
+
+    Args:
+        s (unicode string): input unicode string
+        normalize_whitespace (bool): if True, normalize all whitespace to single spaces (including newlines),
+                                     strip whitespace at start/end
+        normalize_unicode (bool): if True, normalize unicode form to 'form'
+        form (str): unicode form
+        enforce_encoding (bool): if True, encode string to target encoding and re-decode, ignoring errors
+                                 and stripping all characters not part of the encoding
+        encoding (str): target encoding for the above
+        strip_non_printable (bool): if True, strip all non-printable characters
+
+    Returns:
+        str: unicode output string
+    """
+
+    if enforce_encoding:
+        s = s.encode(encoding, errors='ignore').decode(encoding, errors='ignore')
+
+    if strip_non_printable:
+        s = control_char_re.sub('', s)
+
+    if normalize_unicode:
+        s = unicodedata.normalize(form, s)
+
+    if normalize_whitespace:
+        s = re.sub(r'\s+', ' ', s).strip()
+
+    return s

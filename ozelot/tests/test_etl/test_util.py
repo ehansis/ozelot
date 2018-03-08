@@ -1,4 +1,5 @@
-"""Unit tests for task base classes
+# coding=utf-8
+"""Unit tests for ETL utilities
 """
 
 import os
@@ -129,3 +130,69 @@ class TestFlowchart(unittest.TestCase):
 
         # clean up
         os.remove(out_base + '.dot')
+
+
+class TestStringSanitizing(unittest.TestCase):
+
+    def test01(self):
+        """A very benign string"""
+        s = util.sanitize(u"aaa bbb ccc")
+        self.assertEquals(s, u"aaa bbb ccc")
+
+    def test02a(self):
+        """Strip whitespace"""
+        s = util.sanitize(u"\t\t too \n   much  \r\n  whitespace!   ")
+        self.assertEquals(s, u"too much whitespace!")
+
+    def test02b(self):
+        """Don't strip whitespace (but remove non-printable chars)"""
+        s = util.sanitize(u"\t\t too \n   much  \r\n  whitespace!   ",
+                          normalize_whitespace=False)
+        self.assertEquals(s, u" too    much    whitespace!   ")
+
+    def test02c(self):
+        """Don't strip whitespace (and do not remove non-printable chars)"""
+        s = util.sanitize(u"\t\t too \n   much  \r\n  whitespace!   ",
+                          normalize_whitespace=False, strip_non_printable=False)
+        self.assertEquals(s, u"\t\t too \n   much  \r\n  whitespace!   ")
+
+    def test03a(self):
+        """Normalize unicode representation"""
+        # decomposed C with cedilla and roman numeral I
+        s = util.sanitize(u"\u0043\u0327\u2160")
+        # C with cedilla and capital I
+        self.assertEquals(s, u"\u00C7I")
+
+    def test03b(self):
+        """Don't normalize unicode representation"""
+        # C with cedilla and roman numeral I
+        s = util.sanitize(u"\u00C7\u2160", normalize_unicode=False)
+        # same as before
+        self.assertEquals(s, u"\u00C7\u2160")
+
+    def test03c(self):
+        """Normalize to different unicode representation"""
+        # decomposed C with cedilla
+        s = util.sanitize(u"\u00C7", form='NFKD')
+        # C with cedilla and capital I
+        self.assertEquals(s, u"\u0043\u0327")
+
+    def test04a(self):
+        """Normalize encoding"""
+        s = util.sanitize(u"Hör auf!", encoding='ascii')
+        self.assertEquals(s, u"Hr auf!")
+
+    def test04b(self):
+        """Don't normalize encoding"""
+        s = util.sanitize(u"Hör auf!", encoding='ascii', enforce_encoding=False)
+        self.assertEquals(s, u"Hör auf!")
+
+    def test05a(self):
+        """Strip non-printable characters"""
+        s = util.sanitize(u"Bell:\u0007")
+        self.assertEquals(s, u"Bell:")
+
+    def test05b(self):
+        """Don't strip non-printable characters"""
+        s = util.sanitize(u"Bell:\u0007", strip_non_printable=False)
+        self.assertEquals(s, u"Bell:\u0007")
