@@ -112,7 +112,7 @@ class RequestCache(object):
         """
         return self.session.query(CachedRequest).filter(CachedRequest.url == url).filter(CachedRequest.xpath == xpath)
 
-    def get(self, url, store_on_error=False, xpath=None, rate_limit=None):
+    def get(self, url, store_on_error=False, xpath=None, rate_limit=None, log_hits=True, log_misses=True):
         """Get a URL via the cache.
 
         If the URL exists in the cache, return the cached value. Otherwise perform the request,
@@ -131,6 +131,8 @@ class RequestCache(object):
                 in the response.
             rate_limit (float): If not None (default), wait at least this many seconds between the previous
                 request and the current one (this does not apply to cache hits).
+            log_hits (bool): If True, log cache hits
+            log_misses (bool): If True, log cache misses
 
         Returns:
             str: request content
@@ -139,13 +141,15 @@ class RequestCache(object):
         try:
             # get cached request - if none is found, this throws a NoResultFound exception
             cached = self._query(url, xpath).one()
-            config.logger.info("Request cache hit: " + url)
+            if log_hits:
+                config.logger.info("Request cache hit: " + url)
 
             # if the cached value is from a request that resulted in an error, throw an exception
             if cached.status_code != requests.codes.ok:
                 raise RuntimeError("Cached request returned an error, code " + str(cached.status_code))
         except NoResultFound:
-            config.logger.info("Request cache miss: " + url)
+            if log_misses:
+                config.logger.info("Request cache miss: " + url)
 
             # perform the request
             try:
