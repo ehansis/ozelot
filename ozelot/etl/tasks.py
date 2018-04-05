@@ -59,6 +59,16 @@ class TaskBase(luigi.Task):
         """
         return get_task_param_string(self)
 
+    @classmethod
+    def build(cls, local_scheduler=True, **task_params):
+        """Instantiate the task and build it with luigi
+
+        Args:
+            local_scheduler (bool): use a local scheduler (True, default) or a remote scheduler
+            task_params: parameters to pass to task for instantiation
+        """
+        luigi.build([cls(**task_params)], local_scheduler=local_scheduler)
+
 
 class ORMTask(TaskBase):
     """A task with one target of type :class:`ozelot.models.target.ORMTarget` representing the task and its parameters.

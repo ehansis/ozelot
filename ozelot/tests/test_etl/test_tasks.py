@@ -10,6 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import relationship
 import pandas as pd
 import luigi
+from luigi.parameter import MissingParameterException
 
 from ozelot.orm.target import ORMTargetMarker
 from ozelot.etl.tasks import ORMTask, ORMObjectCreatorMixin, ORMWrapperTask, TaskBase, InputFileTask, \
@@ -704,3 +705,20 @@ class TestTaskCheckCompletion(unittest.TestCase):
         self.assertFalse(is_complete)
         is_complete = check_completion(TreeTask2B(), clear=True)
         self.assertFalse(is_complete)
+
+    def test09a(self):
+        """Check completion on top-level task after building the full pipeline with the task's build method
+        """
+        TreeTaskAll.build()
+        self.assertTrue(check_completion(TreeTaskAll()))
+
+    def test09b(self):
+        """Check completion on a task with parameters after building it with the task's build method
+        """
+        TreeTask1A.build(param='lala')
+        self.assertTrue(check_completion(TreeTask1A(param='lala')))
+
+    def test09c(self):
+        """Make sure building with missing paramters fails when using the task's build method
+        """
+        self.assertRaises(MissingParameterException, TreeTask1A.build)
