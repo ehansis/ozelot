@@ -74,6 +74,8 @@ class Client(object):
         # create the engine
         if params is not None:
             engine_params = params.get('engine_params', {})
+        else:
+            engine_params = {}
         self.engine = sa.create_engine(connection_string, **engine_params)
 
         # turn on foreign key support for SQLite (required for cascading deletes etc.)
