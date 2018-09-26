@@ -72,7 +72,9 @@ class Client(object):
             config.logger.info("Client connecting to: " + connection_string)
 
         # create the engine
-        self.engine = sa.create_engine(connection_string)
+        if params is not None:
+            engine_params = params.get('engine_params', {})
+        self.engine = sa.create_engine(connection_string, **engine_params)
 
         # turn on foreign key support for SQLite (required for cascading deletes etc.)
         if connection_string.startswith('sqlite://'):
