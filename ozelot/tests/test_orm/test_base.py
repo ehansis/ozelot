@@ -41,11 +41,6 @@ class MyModelValidation(base.Base):
         return self.truncate_to_field_length(field, value)
 
 
-class MyBadMultipleInheritanceModel(MyModelA, MyModelB):
-    a_id = sa.Column(sa.Integer(), sa.ForeignKey(MyModelA.id))
-    b_id = sa.Column(sa.Integer(), sa.ForeignKey(MyModelB.id))
-
-
 class MyNotAModel(object):
     i = 5
 
@@ -258,20 +253,13 @@ class BaseTest(unittest.TestCase):
         metadata.reflect(self.client.get_engine())
         self.assertEqual(len(metadata.tables), 0)
 
-    def test09(self):
-        """Getting max ID for a model with multiple inheritance failes
-        """
-        session = self.client.create_session()
-        self.assertRaises(RuntimeError, MyBadMultipleInheritanceModel.get_max_id, session)
-        session.close()
-
     def test10(self):
         """Test class registry
         """
         # class registry might have accumulated tasks from other tests
         self.assertGreaterEqual(len(base.model_registry), 6)
         for c in ['MyModelA', 'MyModelB', 'MyModelB2', 'MyModelC',
-                  'MyModelValidation', 'MyBadMultipleInheritanceModel']:
+                  'MyModelValidation']:
             self.assertIn(c, list(base.model_registry.keys()))
 
     def test11a(self):
